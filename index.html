@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CardioWeekly · Oct 4, 2026</title>
+<style>
+/* Layout: single reading column, masthead with ECG trace, sticky section nav, trial "cards" as clinical abstracts with a mini forest plot */
+:root{
+  --bg:#f5f7f9; --surface:#ffffff; --ink:#15212c; --muted:#5a6774; --line:#dde3e9;
+  --accent:#a3243a; --accent-soft:#f7e6e9; --reg:#1f5f7a; --reg-soft:#e3eff4;
+  --yes:#1d7a4a; --yes-soft:#e2f2e9; --no:#6b7480; --no-soft:#eceff2; --warn:#9a5b00; --warn-soft:#fbefd9;
+  --f-display:"Helvetica Neue", Helvetica, Arial, sans-serif;
+  --f-body:"Helvetica Neue", Helvetica, Arial, sans-serif;
+  --f-mono:"Helvetica Neue", Helvetica, Arial, sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f151b; --surface:#161e26; --ink:#e4e9ee; --muted:#97a3af; --line:#26313c;
+  --accent:#ef6f84; --accent-soft:#3a1d24; --reg:#7cc0dc; --reg-soft:#14303c;
+  --yes:#6fd19c; --yes-soft:#163326; --no:#a2acb7; --no-soft:#222b34; --warn:#f0b25a; --warn-soft:#382a12;
+  color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#0f151b; --surface:#161e26; --ink:#e4e9ee; --muted:#97a3af; --line:#26313c;
+  --accent:#ef6f84; --accent-soft:#3a1d24; --reg:#7cc0dc; --reg-soft:#14303c;
+  --yes:#6fd19c; --yes-soft:#163326; --no:#a2acb7; --no-soft:#222b34; --warn:#f0b25a; --warn-soft:#382a12;
+  color-scheme:dark;}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;padding-inline:16px;padding-block:0 64px}
+.wrap{max-width:860px;margin:0 auto}
+a{color:var(--accent);text-underline-offset:2px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;text-wrap:balance;margin:0;line-height:1.2}
+p{margin:0}
+.mono{font-family:var(--f-mono);font-size:.82em}
+.label{font-size:.72rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+
+/* Masthead */
+.mast{padding-block:40px 20px;display:grid;gap:10px}
+.mast .eyebrow{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.mast .dot{width:9px;height:9px;border-radius:50%;background:var(--ink);flex:none}
+.mast h1{font-size:clamp(2.4rem,7vw,3.6rem);letter-spacing:-.025em}
+.mast h1 span{color:var(--accent)}
+.mast .week{font-family:var(--f-display);font-style:italic;font-size:1.2rem;color:var(--muted)}
+.ecg{width:100%;height:46px;display:block;margin-top:6px}
+.ecg path{fill:none;stroke:var(--accent);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
+@media (prefers-reduced-motion:no-preference){
+  .ecg path{stroke-dasharray:1400;stroke-dashoffset:0;animation:trace 2.4s ease-out both}
+  @keyframes trace{from{stroke-dashoffset:1400}to{stroke-dashoffset:0}}
+}
+
+/* Nav */
+nav.toc{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding-block:10px;margin-bottom:28px}
+nav.toc ul{list-style:none;margin:0;padding:0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+nav.toc a{display:block;white-space:nowrap;font-size:.84rem;font-weight:500;color:var(--muted);text-decoration:none;padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:var(--surface)}
+nav.toc a:hover{color:var(--ink);border-color:var(--muted)}
+nav.toc a.arch{color:var(--accent);border-color:var(--accent)}
+
+section{display:grid;gap:18px;margin-bottom:52px;scroll-margin-top:70px}
+section > header{display:grid;gap:4px}
+section h2{font-size:1.65rem}
+.lede{color:var(--muted);max-width:65ch}
+
+/* Part divider */
+.part{border-top:2px solid var(--ink);padding-top:18px;margin-bottom:32px;scroll-margin-top:70px}
+.part h2{font-size:clamp(2rem,5.5vw,2.75rem);letter-spacing:-.01em}
+
+/* Quiet-week banner */
+.banner{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:18px 20px;display:grid;gap:6px}
+.banner strong{font-family:var(--f-display);font-size:1.15rem;font-weight:600}
+
+/* Takeaways */
+.takeaways{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.takeaways li{display:grid;grid-template-columns:9rem 1fr;gap:14px;align-items:start;padding-block:12px;border-top:1px solid var(--line)}
+.takeaways li:first-child{border-top:0}
+.tag{display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:4px;white-space:nowrap}
+.tag.reg{background:var(--reg-soft);color:var(--reg)}
+.tag.safety{background:var(--warn-soft);color:var(--warn)}
+.tag.trial{background:var(--accent-soft);color:var(--accent)}
+.tag.yes{background:var(--yes-soft);color:var(--yes)}
+.tag.no{background:var(--no-soft);color:var(--no)}
+.takeaways li > div{min-width:0}
+.takeaways .t{min-width:0}
+
+/* Guidelines */
+.docs{display:grid;gap:14px}
+.doc{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:grid;gap:8px;min-width:0}
+.doc h3{font-size:1.08rem}
+.doc .meta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.84rem;color:var(--muted)}
+.caveat{border-left:3px solid var(--warn);background:var(--warn-soft);padding:10px 14px;border-radius:0 6px 6px 0;font-size:.93rem}
+.caveat b{color:var(--warn)}
+
+/* FDA timeline */
+.timeline{list-style:none;margin:0;padding:0;display:grid}
+.timeline li{display:grid;grid-template-columns:96px 1fr;gap:16px;padding-block:14px;border-top:1px solid var(--line)}
+.timeline li:first-child{border-top:0}
+.timeline .date{font-family:var(--f-mono);font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums;padding-top:2px}
+.timeline .body{min-width:0;display:grid;gap:3px}
+.timeline .prod{font-weight:600}
+.timeline .basis{font-size:.9rem;color:var(--muted)}
+.timeline li.recall .prod{color:var(--warn)}
+
+/* Trials */
+.trial{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;min-width:0}
+.trial .head{padding:20px 22px 14px;display:grid;gap:8px}
+.trial .head .row{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between}
+.trial h3{font-size:1.3rem}
+.trial h3 a{color:inherit;text-decoration:none}
+.trial h3 a:hover{text-decoration:underline;text-decoration-color:var(--accent)}
+.trial .src{font-size:.86rem;color:var(--muted)}
+.bottom{margin:0 22px 16px;padding:12px 16px;background:var(--bg);border-radius:8px;font-size:.96rem}
+.bottom .label{display:block;margin-bottom:2px;color:var(--accent)}
+dl.facts{margin:0;display:grid;grid-template-columns:170px 1fr;border-top:1px solid var(--line)}
+dl.facts dt,dl.facts dd{padding:10px 22px;border-bottom:1px solid var(--line);margin:0}
+dl.facts dt{font-size:.74rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding-top:13px;padding-right:0}
+dl.facts dd{min-width:0;font-size:.95rem;font-variant-numeric:tabular-nums}
+dl.facts > :nth-last-child(-n+2){border-bottom:0}
+.num{font-weight:600}
+
+/* Forest plot */
+.forest{padding:6px 22px 16px}
+.forest svg{width:100%;max-width:420px;height:auto;display:block}
+.forest .axis{stroke:var(--line);stroke-width:1}
+.forest .tick{fill:var(--muted);font-family:var(--f-mono);font-size:9px}
+.forest .unity{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3}
+.forest .ci{stroke:var(--ink);stroke-width:2}
+.forest .pt{fill:var(--accent)}
+.forest .margin{stroke:var(--warn);stroke-width:1.2;stroke-dasharray:4 3}
+.forest .mlabel{fill:var(--warn);font-family:var(--f-body);font-size:9px;font-weight:600}
+.forest .side{fill:var(--muted);font-family:var(--f-body);font-size:9px}
+
+.empty{color:var(--muted);font-size:.95rem;padding:14px 18px;border:1px dashed var(--line);border-radius:10px}
+
+/* Radar */
+.radar{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.radar li{padding-block:12px;border-top:1px solid var(--line);display:grid;gap:3px}
+.radar li:first-child{border-top:0}
+.radar .what{font-weight:600}
+.radar .meta{font-size:.84rem;color:var(--muted)}
+
+footer{color:var(--muted);font-size:.84rem;border-top:1px solid var(--line);padding-top:18px;max-width:70ch}
+
+@media (max-width:620px){
+  dl.facts{grid-template-columns:1fr}
+  dl.facts dt{border-bottom:0;padding-bottom:0}
+  dl.facts dd{padding-top:2px}
+  .timeline li{grid-template-columns:1fr;gap:4px}
+  .takeaways li{grid-template-columns:1fr;gap:6px}
+  .trial .head,.forest{padding-inline:16px}
+  .bottom{margin-inline:16px}
+  dl.facts dt,dl.facts dd{padding-inline:16px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="mast">
+    <div class="eyebrow">
+      <span class="label">Practice-changing cardiology, every Sunday</span>
+      <span class="dot" aria-hidden="true"></span>
+      <span class="label">First issue · Sunday, Oct 4, 2026</span>
+    </div>
+    <h1>Cardio<span>Weekly</span></h1>
+    <p class="week">Week of Sept 28 – Oct 4, 2026</p>
+    <svg class="ecg" viewBox="0 0 860 46" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 30 H120 l8 -4 l8 4 H160 l4 4 l6 -30 l6 38 l5 -12 H220 q14 -10 28 0 H360 l8 -4 l8 4 H400 l4 4 l6 -30 l6 38 l5 -12 H460 q14 -10 28 0 H600 l8 -4 l8 4 H640 l4 4 l6 -30 l6 38 l5 -12 H700 q14 -10 28 0 H860"/>
+    </svg>
+  </header>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#takeaways">Key takeaways</a></li>
+      <li><a href="#guidelines">Guidelines</a></li>
+      <li><a href="#fda">FDA</a></li>
+      <li><a href="#congress">Congress watch</a></li>
+      <li><a href="#by-topic">By Topic</a></li>
+      <li><a href="#radar">On the radar</a></li>
+      <li><a class="arch" href="archive.html">Archive</a></li>
+    </ul>
+  </nav>
+
+  <section id="takeaways">
+    <div class="banner">
+      <strong>A quiet week for practice-changing cardiology.</strong>
+      <p class="lede">No cardiology phase 3 trial in the top-tier journals met the practice-changing bar this week. Most of the large trials published were obesity and diabetes studies released during EASD 2026. This issue is short on purpose.</p>
+    </div>
+    <header>
+      <h2>Key takeaways</h2>
+    </header>
+    <ul class="takeaways">
+      <li><span class="t"><span class="tag reg">FDA · Sept 30</span></span>
+        <div><b>Mavacamten is now approved for adolescents</b> (12 to &lt;18 years, ≥30 kg) with symptomatic obstructive HCM, based on SCOUT-HCM. It is the first approved drug for adolescent oHCM, so refer eligible patients to an HCM center.</div></li>
+      <li><span class="t"><span class="tag safety">Class I recall</span></span>
+        <div><b>Abiomed automated Impella controller</b>: a purge-related component defect, with 37 serious injuries and 3 deaths reported. Devices stay in use while components are replaced. Shock teams should review the field-safety notice.</div></li>
+      <li><span class="t"><span class="tag trial">Trial</span></span>
+        <div><b>SWEDEGRAFT at 7 years</b>: no-touch vein harvesting did not reduce death, MI or repeat revascularization (19.8% vs 20.4%) and causes more leg-wound complications. Routine use is not supported.</div></li>
+      <li><span class="t"><span class="tag trial">Trial</span></span>
+        <div><b>ACHIEVE-4</b>: oral orforglipron was non-inferior to insulin glargine for MACE-4 (4.2% vs 5.0%; HR 0.84). This shows safety, not benefit. GLP-1 RAs and tirzepatide with outcome data remain first-line in T2D with ASCVD.</div></li>
+    </ul>
+  </section>
+
+  <section id="guidelines">
+    <header>
+      <span class="label">02 · Guidelines &amp; statements</span>
+    </header>
+    <div class="docs">
+      <article class="doc">
+        <h3>2026 AHA/ACC/ACS/ASNC/HRS/SCA/SCCT/SCMR/SVM Guideline for Perioperative Cardiovascular Management for Noncardiac Surgery</h3>
+        <div class="meta"><span>JACC 88(13):1543–1643 · Sept 28–29</span><a class="mono" href="https://doi.org/10.1016/j.jacc.2026.06.017">doi:10.1016/j.jacc.2026.06.017</a><a class="mono" href="https://doi.org/10.1161/CIR.0000000000001472">Circulation version</a></div>
+        <p class="caveat"><b>Editorial caveat.</b> The abstract describes the same evidence base as the 2024 perioperative guideline (literature search Aug 2022 to Mar 2023) and says it supersedes the 2014 guideline. It does not mention 2024. The full text was not accessible, so new or changed Class I/III recommendations could not be confirmed.</p>
+        <p>The core framework is unchanged: stepwise risk assessment; stress testing only when indicated regardless of surgery; CCTA as an option (2b) when functional capacity is poor or unknown; selective NT-proBNP and troponin; stop SGLT2i 3–4 days before surgery; delay elective surgery ≥12 months after DES for ACS (Class 1) and ≥6 months for CCS (2a); bridge anticoagulation only at the highest thrombotic risk; follow up new postoperative AF closely.</p>
+      </article>
+      <article class="doc">
+        <h3>EJHF Expert Consensus: preventing HF across the cardiovascular-kidney-metabolic spectrum</h3>
+        <div class="meta"><span>Eur J Heart Fail · Oct 1</span><a class="mono" href="https://doi.org/10.1093/ejhf/xuag301">doi:10.1093/ejhf/xuag301</a></div>
+        <p>Recommends starting RASi, SGLT2i, finerenone and incretin-based agents early and in parallel in at-risk and pre-HF patients with T2D, CKD or obesity, with HFpEF prevention as the main target. No new graded recommendations.</p>
+      </article>
+      <article class="doc">
+        <h3>AHA Scientific Statement: undertreated antithrombotic therapy</h3>
+        <div class="meta"><span>Circulation · Oct 1</span><a class="mono" href="https://doi.org/10.1161/CIR.0000000000001474">doi:10.1161/CIR.0000000000001474</a></div>
+        <p>Covers omission, underdosing and nonadherence in AF, VTE and PAD and their link to stroke, recurrent thrombosis and death, and supports antithrombotic stewardship. Off-label DOAC underdosing in AF is the target most relevant to clinics.</p>
+      </article>
+      <article class="doc">
+        <h3>AF Ablation Academic Research Consortium (AFA-ARC), HRS-endorsed</h3>
+        <div class="meta"><span>Circ Arrhythm Electrophysiol · Sept 29</span><a class="mono" href="https://doi.org/10.1161/CIRCEP.126.015082">doi:10.1161/CIRCEP.126.015082</a></div>
+        <p>Standard effectiveness and safety endpoints and trial designs for pivotal AF-ablation device trials, including PFA, developed with FDA input. It will shape how future ablation trials are read. It is not a clinical guideline.</p>
+      </article>
+      <article class="doc">
+        <h3>2026 ACC Scientific Statement: nutrition for preventing and managing CVD</h3>
+        <div class="meta"><span>JACC · Sept 30</span><a class="mono" href="https://doi.org/10.1016/j.jacc.2026.08.025">doi:10.1016/j.jacc.2026.08.025</a></div>
+        <p>A statement on dietary patterns, useful for patient counselling. No graded recommendations.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="fda">
+    <header>
+      <h2>Regulatory news</h2>
+    </header>
+    <ol class="timeline">
+      <li><span class="date">Oct 2</span><div class="body"><span class="prod">Autus Size-Adjustable Valve</span><span>Pulmonary valve for children with congenital pulmonary stenosis or atresia. It can be balloon-expanded after implant from about 13 to 22 mm.</span><span class="basis">62 children at 12 US centers: all procedures succeeded, with no deaths, strokes or thrombi needing treatment. <a href="https://medicalxpress.com/news/2026-10-heart-valve-patient-fda.html">Source</a></span></div></li>
+      <li><span class="date">Sept 30</span><div class="body"><span class="prod">Mavacamten (Camzyos): label expansion</span><span>Symptomatic oHCM in adults and pediatric patients ≥30 kg.</span><span class="basis">SCOUT-HCM, n=44 adolescents: Valsalva LVOT gradient −48.0 mm Hg vs placebo at week 28; no LVEF &lt;50%. <a href="https://news.bms.com/news/corporate-financial/2026/U-S--Food-and-Drug-Administration-Approves-Expanded-Indication-for-Bristol-Myers-Squibbs-CAMZYOS-mavacamten-for-the-Treatment-of-Symptomatic-Obstructive-Hypertrophic-Cardiomyopathy-oHCM-in-Adults-and-Pediatric-Patients/default.aspx">Source</a></span></div></li>
+      <li><span class="date">Sept 22</span><div class="body"><span class="prod">Sotatercept (Winrevair): label update</span><span>Adds HYPERION data for adults with PAH diagnosed within 12 months, FC II–III, at intermediate to high risk.</span><span class="basis">Clinical worsening 10.6% vs 36.9%. <a href="https://www.businesswire.com/news/home/20260922788462/en/">Source</a></span></div></li>
+      <li class="recall"><span class="date">Sept 16–24</span><div class="body"><span class="prod">Class I recall: Abiomed automated Impella controller</span><span>Purge-related component defect; 37 serious injuries and 3 deaths reported as of Aug 17. Devices may remain in use while components are replaced.</span><span class="basis"><a href="https://www.healthcare-brew.com/stories/recall-roundup-september-2026">Source</a></span></div></li>
+      <li><span class="date">Sept 15</span><div class="body"><span class="prod">Aveir VR Mini leadless pacemaker (Abbott)</span><span>Ventricular leadless pacing, 14% shorter (32.5 mm). Works with the Aveir DR dual-chamber system.</span><span class="basis"><a href="https://www.massdevice.com/abbott-wins-fda-approval-for-aveir-vr-mini-ventricular-leadless-pacemaker/">Source</a></span></div></li>
+      <li><span class="date">Sept 8</span><div class="body"><span class="prod">TactiFlex Duo, Sensor Enabled (Abbott)</span><span>Dual-energy PFA/RF catheter for AF ablation.</span><span class="basis">FlexPulse IDE: 74.6% free from recurrence, medication change or repeat procedure at 12 months; 1.7% primary safety events. <a href="https://www.massdevice.com/abbott-earns-fda-approval-for-new-dual-energy-ablation-catheter/">Source</a></span></div></li>
+      <li><span class="date">Aug 28</span><div class="body"><span class="prod">Tirzepatide (Mounjaro): new CV indication</span><span>MACE reduction in T2D with established CVD.</span><span class="basis">SURPASS-CVOT, n &gt;13,000, vs dulaglutide: MACE 12.2% vs 13.1%, non-inferior. <a href="https://www.healthline.com/health-news/fda-approves-mounjaro-tirzepatide-cardiovascular-risk-reduction">Source</a></span></div></li>
+    </ol>
+  </section>
+
+  <section id="congress">
+    <header>
+      <span class="label">04 · Congress watch</span>
+      <h2>EASD 2026 · Milan, Sept 28 – Oct 2</h2>
+      <p class="lede">EASD is a diabetes meeting, not a cardiology congress. It is included because several large cardiometabolic phase 3 trials were published in NEJM and Lancet in the same week. No cardiology congress ran in the window.</p>
+    </header>
+  </section>
+
+  <div class="part" id="by-topic">
+    <h2>By Topic</h2>
+  </div>
+
+  <section id="coronary">
+    <header>
+      <span class="label">05 · Coronary &amp; prevention</span>
+      <h2>Coronary &amp; prevention</h2>
+    </header>
+
+    <article class="trial">
+      <div class="head">
+        <div class="row"><span class="src">JAMA Cardiology · Sept 30, 2026 · PMID 42814420</span></div>
+        <h3><a href="https://doi.org/10.1001/jamacardio.2026.4222">SWEDEGRAFT: no-touch vs conventional saphenous vein harvesting in CABG, 7 years</a></h3>
+      </div>
+      <div class="forest" aria-label="Hazard ratio 0.98, 95% CI 0.73 to 1.31">
+        <svg viewBox="0 0 320 58" role="img">
+          <text class="side" x="20" y="10">Favors no-touch</text><text class="side" x="300" y="10" text-anchor="end">Favors conventional</text>
+          <line class="axis" x1="20" y1="40" x2="300" y2="40"/>
+          <line class="unity" x1="160" y1="14" x2="160" y2="40"/>
+          <line class="ci" x1="96.4" y1="26" x2="214.5" y2="26"/>
+          <rect class="pt" x="151.9" y="22" width="8" height="8"/>
+          <text class="tick" x="20" y="52" text-anchor="middle">0.5</text><text class="tick" x="101.8" y="52" text-anchor="middle">0.75</text><text class="tick" x="160" y="52" text-anchor="middle">1.0</text><text class="tick" x="241.8" y="52" text-anchor="middle">1.5</text><text class="tick" x="300" y="52" text-anchor="middle">2.0</text>
+        </svg>
+      </div>
+      <p class="bottom"><span class="label">Bottom line</span>Routine no-touch harvesting is not supported: no clinical benefit at 7 years and more leg morbidity. The CI is wide, so the trial had limited power for a modest effect. Academic funding.</p>
+      <dl class="facts">
+        <dt>Design</dt><dd>Multicenter RCT (8 Swedish centers and 1 Danish), registry follow-up; mITT N=900; median 6.5 years</dd>
+        <dt>Population</dt><dd>Primary, nonemergent, isolated CABG; mean age 67; 12% women; 47% nonelective</dd>
+        <dt>Comparison</dt><dd>No-touch harvesting (n=454) vs conventional (n=446)</dd>
+        <dt>Primary endpoint</dt><dd>Death, MI or repeat revascularization: <span class="num">19.8% vs 20.4%</span>; HR 0.98 (0.73–1.31); adjusted 7-year risk difference −0.8% (−6.6 to 4.6). All components neutral.</dd>
+        <dt>Safety</dt><dd>More leg-wound complications with no-touch, as previously reported</dd>
+      </dl>
+    </article>
+
+    <article class="trial">
+      <div class="head">
+        <div class="row"><span class="src">Lancet · Sept 30, 2026 · PMID 42815506</span></div>
+        <h3><a href="https://doi.org/10.1016/S0140-6736(26)01865-9">ACHIEVE-4: orforglipron vs insulin glargine for cardiovascular safety in T2D</a></h3>
+      </div>
+      <div class="forest" aria-label="Hazard ratio 0.84, 95% CI 0.59 to 1.20; non-inferiority margin 1.8">
+        <svg viewBox="0 0 320 58" role="img">
+          <text class="side" x="20" y="10">Favors orforglipron</text><text class="side" x="300" y="10" text-anchor="end">Favors glargine</text>
+          <line class="axis" x1="20" y1="40" x2="300" y2="40"/>
+          <line class="unity" x1="160" y1="14" x2="160" y2="40"/>
+          <line class="margin" x1="278.7" y1="16" x2="278.7" y2="40"/>
+          <text class="mlabel" x="274" y="34" text-anchor="end">NI margin 1.8</text>
+          <line class="ci" x1="53.4" y1="26" x2="196.8" y2="26"/>
+          <rect class="pt" x="120.8" y="22" width="8" height="8"/>
+          <text class="tick" x="20" y="52" text-anchor="middle">0.5</text><text class="tick" x="101.8" y="52" text-anchor="middle">0.75</text><text class="tick" x="160" y="52" text-anchor="middle">1.0</text><text class="tick" x="241.8" y="52" text-anchor="middle">1.5</text><text class="tick" x="300" y="52" text-anchor="middle">2.0</text>
+        </svg>
+      </div>
+      <p class="bottom"><span class="label">Bottom line</span>Rules out excess CV harm for the first oral non-peptide GLP-1 RA, but does not show benefit: the comparator was insulin, the trial was open-label, and there were only 124 events. In T2D with ASCVD, keep agents with proven MACE reduction first. Funded by Eli Lilly.</p>
+      <dl class="facts">
+        <dt>Design</dt><dd>Phase 3, event-driven, open-label, non-inferiority; N=2,749; 317 sites; median 2 years</dd>
+        <dt>Population</dt><dd>T2D (HbA1c 7.0–10.5%), BMI ≥25, all with established CVD (86%) or CKD (38%); mean age 63</dd>
+        <dt>Comparison</dt><dd>Oral orforglipron daily (up to 36 mg) vs titrated insulin glargine</dd>
+        <dt>Primary endpoint</dt><dd>MACE-4: <span class="num">4.2% vs 5.0%</span>; HR 0.84 (0.59–1.20); non-inferiority met; absolute difference −0.8% (not significant for superiority)</dd>
+        <dt>Safety</dt><dd>GI adverse events 62.1% vs 14.2%; significant hypoglycaemia 6.8% vs 19.2%; deaths 1.4% vs 3.2%</dd>
+      </dl>
+    </article>
+
+    <article class="trial">
+      <div class="head">
+        <div class="row"><span class="src">NEJM · Sept 29 · PMID 42814954 &nbsp;|&nbsp; Lancet · Sept 29 · PMID 42810372</span></div>
+        <h3><a href="https://doi.org/10.1056/NEJMoa2604169">TRIUMPH-1</a> &amp; <a href="https://doi.org/10.1016/S0140-6736(26)01861-1">TRIUMPH-2</a>: retatrutide for obesity, with and without T2D</h3>
+      </div>
+      <p class="bottom"><span class="label">Bottom line</span>The largest drug-induced weight loss yet seen in phase 3, but the endpoints are weight only and there are no CV outcome data. Watch for hypotension in patients on several antihypertensives. Not yet approved. Funded by Eli Lilly.</p>
+      <dl class="facts">
+        <dt>Design</dt><dd>Phase 3, double-blind, placebo-controlled, 80 weeks. TRIUMPH-1 N=2,339; TRIUMPH-2 N=1,152</dd>
+        <dt>Population</dt><dd>TRIUMPH-1: obesity without diabetes. TRIUMPH-2: BMI ≥27 with T2D (mean BMI 38.2)</dd>
+        <dt>Comparison</dt><dd>Retatrutide 4, 9 or 12 mg weekly vs placebo</dd>
+        <dt>Primary endpoint</dt><dd>TRIUMPH-1: <span class="num">−23.7% / −25.0%</span> vs −3.9% (9 / 12 mg). TRIUMPH-2: <span class="num">−16.8% / −18.8%</span> vs −5.1%; differences −11.8% and −13.8%</dd>
+        <dt>Safety</dt><dd>Mainly GI. Hypotension 5–6% vs &lt;1% and dysaesthesia 6–7% vs 1% at higher doses; stopped for adverse events 8–12% vs 5%</dd>
+      </dl>
+    </article>
+
+    <article class="trial">
+      <div class="head">
+        <div class="row"><span class="src">NEJM · Oct 1, 2026 · PMID 42820639</span></div>
+        <h3><a href="https://doi.org/10.1056/NEJMoa2607219">SYNCHRONIZE-2: survodutide in obesity with T2D</a></h3>
+      </div>
+      <p class="bottom"><span class="label">Bottom line</span>A modest effect in T2D compared with tirzepatide- or retatrutide-class agents, with a heavy GI burden. No cardiology relevance until outcome data arrive. Funded by Boehringer Ingelheim.</p>
+      <dl class="facts">
+        <dt>Design</dt><dd>Phase 3, double-blind, placebo-controlled; N=752; 76 weeks</dd>
+        <dt>Population</dt><dd>T2D with BMI ≥27 (mean 36.5; HbA1c 7.4%)</dd>
+        <dt>Comparison</dt><dd>Survodutide 3.6 or 6.0 mg weekly vs placebo</dd>
+        <dt>Primary endpoint</dt><dd>Weight <span class="num">−8.2% / −9.8%</span> vs −3.9%; ≥5% loss in 57.6% / 64.5% vs 35.1%</dd>
+        <dt>Safety</dt><dd>GI adverse events 73–78% vs 39%</dd>
+      </dl>
+    </article>
+  </section>
+
+  <section id="other-domains">
+    <header>
+      <span class="label">06 · Heart failure, electrophysiology, structural</span>
+      <h2>No qualifying trials this week</h2>
+    </header>
+    <p class="empty">No phase 3 RCTs or decisive meta-analyses in HF, EP or structural heart disease in the window. For related items, see the EJHF prevention consensus and AFA-ARC in the guideline box, and the mavacamten, TactiFlex Duo and Aveir VR Mini entries under FDA.</p>
+  </section>
+
+  <section id="imaging">
+    <header>
+      <span class="label">07 · Imaging, vascular &amp; other</span>
+      <h2>Imaging, vascular &amp; other</h2>
+    </header>
+    <article class="trial">
+      <div class="head">
+        <div class="row"><span class="src">J Cardiovasc Comput Tomogr · Sept 30, 2026 · PMID 42816231</span></div>
+        <h3><a href="https://doi.org/10.1016/j.jcct.2026.09.007">HALT after TAVR: systematic review and network meta-analysis</a></h3>
+      </div>
+      <p class="bottom"><span class="label">Bottom line</span>Supports the current approach: no routine CT screening for HALT, and no OAC for HALT alone in asymptomatic patients with normal gradients. The effect on durability is unknown. Data are mostly observational, with mixed CT protocols and timing.</p>
+      <dl class="facts">
+        <dt>Design</dt><dd>Pairwise and network meta-analysis of 59 mostly observational studies; N=16,269</dd>
+        <dt>Population</dt><dd>Post-TAVR patients with CT follow-up</dd>
+        <dt>Comparison</dt><dd>By valve platform, antithrombotic regimen and patient factors</dd>
+        <dt>Main findings</dt><dd>HALT in <span class="num">11.0%</span>. Lower with self-expanding supra-annular valves and higher with intra-annular and Lotus valves, compared with balloon-expandable. Less with OAC than without; DOAC and warfarin similar. Small rise in gradient; no short-term clinical events.</dd>
+      </dl>
+    </article>
+  </section>
+
+  <section id="radar">
+    <header>
+      <span class="label">08 · On the radar</span>
+      <h2>On the radar</h2>
+    </header>
+    <ul class="radar">
+      <li><span class="what">HFrEF four-drug polypill, Sri Lanka (pilot RCT)</span><span>A fixed-dose beta-blocker, RASi, MRA and SGLT2i vs usual care, testing feasibility and adherence. Full numeric results were not verified.</span><span class="meta">JAMA Cardiol · Sept 30 · <a class="mono" href="https://doi.org/10.1001/jamacardio.2026.3719">doi:10.1001/jamacardio.2026.3719</a></span></li>
+      <li><span class="what">OCTOBER post hoc: bifurcation PCI (n=1,201)</span><span>Actual 2-stent PCI had higher 2-year MACE than 1-stent (13.9% vs 9.0%; adjusted HR 1.53), with no difference by planned strategy. Angiography-guided DK-crush did worse than OCT-guided (HR 2.42). Hypothesis-generating.</span><span class="meta">JACC Cardiovasc Interv · Sept 28 · <a class="mono" href="https://doi.org/10.1016/j.jcin.2026.06.027">doi:10.1016/j.jcin.2026.06.027</a></span></li>
+      <li><span class="what">Global burden of heart failure, 1990–2023 (GBD)</span><span>Global epidemiology update.</span><span class="meta">JAMA Cardiol · Sept 30 · <a class="mono" href="https://doi.org/10.1001/jamacardio.2026.4068">doi:10.1001/jamacardio.2026.4068</a></span></li>
+      <li><span class="what">PACER RCT</span><span>Telehealth anxiety treatment for patients with low-risk chest pain in the ED.</span><span class="meta">JAMA Intern Med · Sept 28 · PMID 42804196</span></li>
+      <li><span class="what">Semaglutide kidney-mechanism RCT (n=106)</span><span>Coprimary MRI endpoints were neutral. Secondary findings suggest a lower renal resistive index and less fibrosis progression.</span><span class="meta">Nat Med · Oct 1 · <a class="mono" href="https://doi.org/10.1038/s41591-026-04674-2">doi:10.1038/s41591-026-04674-2</a></span></li>
+      <li><span class="what">Coming up</span><span>HFSA 2026 (Phoenix, Oct 9–12) with late-breaking HF trials, then TCT 2026 in San Diego. Expect a busier issue in the next two weeks.</span></li>
+    </ul>
+  </section>
+
+  <footer>
+    <p><b>Method.</b> PubMed searches (Entrez date Sept 26 – Oct 4, 2026) across five domain queries limited to tier-listed journals, plus a sweep of cardiovascular items in NEJM, Lancet, JAMA, BMJ, Circulation, JACC, EHJ and JAMA Cardiology. Web checks covered FDA approvals and recalls over the trailing 60 days, guideline releases and congress calendars. Every journal entry has a PubMed-verified PMID or DOI dated inside the window. Regulatory items cite press releases or news reports. Items dated Oct 5 are held for next week.</p>
+  </footer>
+</div>
+</body>
+</html>
