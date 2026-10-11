@@ -1,8 +1,8 @@
 #!/bin/bash
 # Build the CardioWeekly GitHub Pages site from the local web edition and push it.
-# Source: ~/cardiology weekly report/web (latest.html is body-only; archive.html and issues/*.html are full documents).
+# Source: ~/Documents/Claude/cardiology weekly report/web (latest.html is body-only; archive.html and issues/*.html are full documents).
 set -euo pipefail
-SRC="$HOME/cardiology weekly report/web"
+SRC="$HOME/Documents/Claude/cardiology weekly report/web"
 SITE="$(cd "$(dirname "$0")" && pwd)"
 GH="$HOME/.local/bin/gh"
 
