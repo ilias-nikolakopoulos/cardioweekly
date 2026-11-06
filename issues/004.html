@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CardioWeekly · Oct 25, 2026</title>
+<style>
+/* Layout: single reading column, masthead with ECG trace, sticky section nav, trial "cards" as clinical abstracts with a mini forest plot */
+:root{
+  --bg:#f5f7f9; --surface:#ffffff; --ink:#15212c; --muted:#5a6774; --line:#dde3e9;
+  --accent:#a3243a; --accent-soft:#f7e6e9; --reg:#1f5f7a; --reg-soft:#e3eff4;
+  --yes:#1d7a4a; --yes-soft:#e2f2e9; --no:#6b7480; --no-soft:#eceff2; --warn:#9a5b00; --warn-soft:#fbefd9;
+  --f-display:"Helvetica Neue", Helvetica, Arial, sans-serif;
+  --f-body:"Helvetica Neue", Helvetica, Arial, sans-serif;
+  --f-mono:"Helvetica Neue", Helvetica, Arial, sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f151b; --surface:#161e26; --ink:#e4e9ee; --muted:#97a3af; --line:#26313c;
+  --accent:#ef6f84; --accent-soft:#3a1d24; --reg:#7cc0dc; --reg-soft:#14303c;
+  --yes:#6fd19c; --yes-soft:#163326; --no:#a2acb7; --no-soft:#222b34; --warn:#f0b25a; --warn-soft:#382a12;
+  color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#0f151b; --surface:#161e26; --ink:#e4e9ee; --muted:#97a3af; --line:#26313c;
+  --accent:#ef6f84; --accent-soft:#3a1d24; --reg:#7cc0dc; --reg-soft:#14303c;
+  --yes:#6fd19c; --yes-soft:#163326; --no:#a2acb7; --no-soft:#222b34; --warn:#f0b25a; --warn-soft:#382a12;
+  color-scheme:dark;}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;padding-inline:16px;padding-block:0 64px}
+.wrap{max-width:860px;margin:0 auto}
+a{color:var(--accent);text-underline-offset:2px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;text-wrap:balance;margin:0;line-height:1.2}
+p{margin:0}
+.mono{font-family:var(--f-mono);font-size:.82em}
+.label{font-size:.72rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+
+/* Masthead */
+.mast{padding-block:40px 20px;display:grid;gap:10px}
+.mast .eyebrow{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.mast .dot{width:9px;height:9px;border-radius:50%;background:var(--ink);flex:none}
+.mast h1{font-size:clamp(2.4rem,7vw,3.6rem);letter-spacing:-.025em}
+.mast h1 span{color:var(--accent)}
+.mast .week{font-family:var(--f-display);font-style:italic;font-size:1.2rem;color:var(--muted)}
+.ecg{width:100%;height:46px;display:block;margin-top:6px}
+.ecg path{fill:none;stroke:var(--accent);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
+@media (prefers-reduced-motion:no-preference){
+  .ecg path{stroke-dasharray:1400;stroke-dashoffset:0;animation:trace 2.4s ease-out both}
+  @keyframes trace{from{stroke-dashoffset:1400}to{stroke-dashoffset:0}}
+}
+
+/* Nav */
+nav.toc{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding-block:10px;margin-bottom:28px}
+nav.toc ul{list-style:none;margin:0;padding:0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+nav.toc a{display:block;white-space:nowrap;font-size:.84rem;font-weight:500;color:var(--muted);text-decoration:none;padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:var(--surface)}
+nav.toc a:hover{color:var(--ink);border-color:var(--muted)}
+nav.toc a.arch{color:var(--accent);border-color:var(--accent)}
+
+section{display:grid;gap:18px;margin-bottom:52px;scroll-margin-top:70px}
+section > header{display:grid;gap:4px}
+section h2{font-size:1.65rem}
+.lede{color:var(--muted);max-width:65ch}
+
+/* Part divider */
+.part{border-top:2px solid var(--ink);padding-top:18px;margin-bottom:32px;scroll-margin-top:70px}
+.part h2{font-size:clamp(2rem,5.5vw,2.75rem);letter-spacing:-.01em}
+
+/* Quiet-week banner */
+.banner{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:18px 20px;display:grid;gap:6px}
+.banner strong{font-family:var(--f-display);font-size:1.15rem;font-weight:600}
+
+/* Takeaways */
+.takeaways{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.takeaways li{display:grid;grid-template-columns:9rem 1fr;gap:14px;align-items:start;padding-block:12px;border-top:1px solid var(--line)}
+.takeaways li:first-child{border-top:0}
+.tag{display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:4px;white-space:nowrap}
+.tag.reg{background:var(--reg-soft);color:var(--reg)}
+.tag.safety{background:var(--warn-soft);color:var(--warn)}
+.tag.trial{background:var(--accent-soft);color:var(--accent)}
+.tag.yes{background:var(--yes-soft);color:var(--yes)}
+.tag.no{background:var(--no-soft);color:var(--no)}
+.takeaways li > div{min-width:0}
+.takeaways .t{min-width:0}
+
+/* Guidelines */
+.docs{display:grid;gap:14px}
+.doc{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:grid;gap:8px;min-width:0}
+.doc h3{font-size:1.08rem}
+.doc .meta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.84rem;color:var(--muted)}
+.caveat{border-left:3px solid var(--warn);background:var(--warn-soft);padding:10px 14px;border-radius:0 6px 6px 0;font-size:.93rem}
+.caveat b{color:var(--warn)}
+
+/* FDA timeline */
+.timeline{list-style:none;margin:0;padding:0;display:grid}
+.timeline li{display:grid;grid-template-columns:96px 1fr;gap:16px;padding-block:14px;border-top:1px solid var(--line)}
+.timeline li:first-child{border-top:0}
+.timeline .date{font-family:var(--f-mono);font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums;padding-top:2px}
+.timeline .body{min-width:0;display:grid;gap:3px}
+.timeline .prod{font-weight:600}
+.timeline .basis{font-size:.9rem;color:var(--muted)}
+.timeline li.recall .prod{color:var(--warn)}
+
+/* Trials */
+.trial{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;min-width:0}
+.trial .head{padding:20px 22px 14px;display:grid;gap:8px}
+.trial .head .row{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between}
+.trial h3{font-size:1.3rem}
+.trial h3 a{color:inherit;text-decoration:none}
+.trial h3 a:hover{text-decoration:underline;text-decoration-color:var(--accent)}
+.trial .src{font-size:.86rem;color:var(--muted)}
+.bottom{margin:0 22px 16px;padding:12px 16px;background:var(--bg);border-radius:8px;font-size:.96rem}
+.bottom .label{display:block;margin-bottom:2px;color:var(--accent)}
+dl.facts{margin:0;display:grid;grid-template-columns:170px 1fr;border-top:1px solid var(--line)}
+dl.facts dt,dl.facts dd{padding:10px 22px;border-bottom:1px solid var(--line);margin:0}
+dl.facts dt{font-size:.74rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding-top:13px;padding-right:0}
+dl.facts dd{min-width:0;font-size:.95rem;font-variant-numeric:tabular-nums}
+dl.facts > :nth-last-child(-n+2){border-bottom:0}
+.num{font-weight:600}
+
+/* Forest plot */
+.forest{padding:6px 22px 16px}
+.forest svg{width:100%;max-width:420px;height:auto;display:block}
+.forest .axis{stroke:var(--line);stroke-width:1}
+.forest .tick{fill:var(--muted);font-family:var(--f-mono);font-size:9px}
+.forest .unity{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3}
+.forest .ci{stroke:var(--ink);stroke-width:2}
+.forest .pt{fill:var(--accent)}
+.forest .margin{stroke:var(--warn);stroke-width:1.2;stroke-dasharray:4 3}
+.forest .mlabel{fill:var(--warn);font-family:var(--f-body);font-size:9px;font-weight:600}
+.forest .side{fill:var(--muted);font-family:var(--f-body);font-size:9px}
+
+.empty{color:var(--muted);font-size:.95rem;padding:14px 18px;border:1px dashed var(--line);border-radius:10px}
+
+/* Radar */
+.radar{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.radar li{padding-block:12px;border-top:1px solid var(--line);display:grid;gap:3px}
+.radar li:first-child{border-top:0}
+.radar .what{font-weight:600}
+.radar .meta{font-size:.84rem;color:var(--muted)}
+
+footer{color:var(--muted);font-size:.84rem;border-top:1px solid var(--line);padding-top:18px;max-width:70ch}
+
+@media (max-width:620px){
+  dl.facts{grid-template-columns:1fr}
+  dl.facts dt{border-bottom:0;padding-bottom:0}
+  dl.facts dd{padding-top:2px}
+  .timeline li{grid-template-columns:1fr;gap:4px}
+  .takeaways li{grid-template-columns:1fr;gap:6px}
+  .trial .head,.forest{padding-inline:16px}
+  .bottom{margin-inline:16px}
+  dl.facts dt,dl.facts dd{padding-inline:16px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="mast">
+    <div class="eyebrow">
+      <span class="label">Practice-changing cardiology, every Sunday</span>
+      <span class="dot" aria-hidden="true"></span>
+      <span class="label">Issue No. 4 · Sunday, Oct 25, 2026</span>
+    </div>
+    <h1>Cardio<span>Weekly</span></h1>
+    <p class="week">Week of Oct 19 – Oct 25, 2026</p>
+    <svg class="ecg" viewBox="0 0 860 46" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 30 H120 l8 -4 l8 4 H160 l4 4 l6 -30 l6 38 l5 -12 H220 q14 -10 28 0 H360 l8 -4 l8 4 H400 l4 4 l6 -30 l6 38 l5 -12 H460 q14 -10 28 0 H600 l8 -4 l8 4 H640 l4 4 l6 -30 l6 38 l5 -12 H700 q14 -10 28 0 H860"/>
+    </svg>
+  </header>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#takeaways">Key takeaways</a></li>
+      <li><a href="#guidelines">Guidelines</a></li>
+      <li><a href="#fda">FDA</a></li>
+      <li><a href="#by-topic">By Topic</a></li>
+      <li><a href="#radar">On the radar</a></li>
+      <li><a class="arch" href="../archive.html">Archive</a></li>
+    </ul>
+  </nav>
+
+  <section id="takeaways">
+    <div class="banner">
+      <strong>A quiet week for practice-changing cardiology.</strong>
+      <p class="lede">No phase 3 cardiology trial in the top-tier journals met the practice-changing bar for Oct 19–25, and no congress ran. The useful items are a large pragmatic trial of point-of-care troponin in the ED, an OPTION-STEMI analysis on immediate revascularization in older patients, a meta-analysis of PCI before TAVI, a sham-controlled meta-analysis of AF ablation, and FDA approval of PASCAL for tricuspid repair. Published Monday, Oct 26.</p>
+    </div>
+    <header>
+      <h2>Key takeaways</h2>
+    </header>
+    <ul class="takeaways">
+      <li><span class="t"><span class="tag trial">Trial</span></span>
+        <div><b>Point-of-care hs-troponin in the ED (ICare-FASTER).</b> In a stepped-wedge cluster trial of 59,980 presentations, a point-of-care hs-cTnI assay cut ED stay by 47 minutes (13%), with the same 30-day MI or cardiac death rate (0.39% vs 0.39%).</div></li>
+      <li><span class="t"><span class="tag trial">Trial</span></span>
+        <div><b>Older STEMI patients: stage the non-culprit PCI.</b> In OPTION-STEMI, patients ≥70 had more death, MI or repeat revascularization at 1 year with immediate complete revascularization than with staged in-hospital PCI (22.3% vs 13.8%; HR 1.68). No difference under 70. Post hoc.</div></li>
+      <li><span class="t"><span class="tag trial">Meta-analysis</span></span>
+        <div><b>CAD before TAVI.</b> Across 4 RCTs (n=1,476), routine PCI lowered MACE (RR 0.80, 0.65–0.98) but raised major bleeding (RR 1.57, 1.07–2.32).</div></li>
+      <li><span class="t"><span class="tag trial">Meta-analysis</span></span>
+        <div><b>AF ablation beats sham for symptoms.</b> Pooling 3 sham-controlled trials (n=448), ablation improved AFEQT by 13.5 points (95% CrI 1.6–26.9) and halved AF recurrence (RR 0.49).</div></li>
+      <li><span class="t"><span class="tag reg">FDA</span></span>
+        <div><b>PASCAL Precision approved for tricuspid TEER</b> (Oct 21) in symptomatic severe TR at intermediate or higher surgical risk, based on CLASP II TR. One-year data come at TCT next week.</div></li>
+    </ul>
+  </section>
+
+  <section id="guidelines">
+    <header>
+      <span class="label">Guidelines &amp; statements</span>
+    </header>
+    <div class="docs">
+      <article class="doc">
+        <h3>Management of Heart Transplant Recipients for the Non-Transplant Health Care Provider: HFA/ACNAP Clinical Consensus Statement</h3>
+        <div class="meta"><span>Eur J Heart Fail · Oct 19 · PMID 42895118</span><a class="mono" href="https://doi.org/10.1093/ejhf/xuag326">doi:10.1093/ejhf/xuag326</a></div>
+        <p>A practical guide for cardiologists and GPs who see transplant recipients outside transplant centres: care by time since transplant, immunosuppressant monitoring, recognizing rejection, infection prophylaxis, and surveillance for allograft vasculopathy, cancer, CKD and metabolic disease. Also covers pregnancy, non-cardiac surgery and palliative care, and lists when to refer back early. No graded recommendations.</p>
+      </article>
+      <article class="doc">
+        <h3>Multidisciplinary Collaboration in the Performance of Aortic Surgery: AHA Scientific Statement</h3>
+        <div class="meta"><span>Circulation · Oct 22 · PMID 42910416</span><a class="mono" href="https://doi.org/10.1161/CIR.0000000000001490">doi:10.1161/CIR.0000000000001490</a></div>
+        <p>Surgeon, anaesthesiologist and perfusionist views on aortic surgery: single-lung ventilation, cooling and rewarming, and cerebral, myocardial and visceral protection. A team-process document with no graded recommendations.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="fda">
+    <header>
+      <h2>Regulatory news</h2>
+    </header>
+    <ol class="timeline">
+      <li><span class="date">Oct 21</span><div class="body"><span class="prod">PASCAL Precision system for tricuspid repair (Edwards): PMA</span><span>Symptomatic severe TR despite optimal medical therapy, intermediate or greater surgical risk, judged suitable for T-TEER by a heart team. FDA also approved the PASCAL Ace with Capture Clarity for degenerative mitral TEER.</span><span class="basis">CLASP II TR pivotal trial; 1-year outcomes at TCT 2026. <a href="https://www.tctmd.com/news/fda-green-lights-pascal-system-tricuspid-valve-repair">TCTMD</a> · <a href="https://citoday.com/news/edwards-pascal-precision-system-approved-by-fda-for-tricuspid-valve-repair">CI Today</a></span></div></li>
+      <li><span class="date">Oct 19</span><div class="body"><span class="prod">PerQseal Elite vascular closure system (Haemonetics)</span><span>Fully absorbable patch closure of large-bore arteriotomies (14–22 F sheaths, up to 26 F) after TAVR and other structural or endovascular procedures.</span><span class="basis">Single-arm ELITE study: 0% VARC-3 major complications, mean time to hemostasis under 1 minute. <a href="https://citoday.com/news/fda-approves-haemonetics-perqseal-elite-vascular-closure-system-1">Source</a></span></div></li>
+      <li><span class="date">Oct 1</span><div class="body"><span class="prod">Autus Size-Adjustable Valve</span><span>Growth-adjustable surgical pulmonary valve for children.</span><span class="basis"><a href="https://www.fda.gov/news-events/press-announcements/fda-approves-first-heart-valve-designed-grow-children">FDA</a></span></div></li>
+      <li><span class="date">Sept 28</span><div class="body"><span class="prod">Tempus ECG-MR: 510(k)</span><span>AI-ECG flag for possible moderate or severe mitral regurgitation in adults ≥65.</span><span class="basis">Covered in <a href="003.html">No. 3</a>.</span></div></li>
+      <li><span class="date">Sept 21</span><div class="body"><span class="prod">SELUTION SLR sirolimus drug-eluting balloon (Cordis)</span><span>Coronary in-stent restenosis.</span><span class="basis">Covered in <a href="003.html">No. 3</a>.</span></div></li>
+      <li class="recall"><span class="date">Sept 16–24</span><div class="body"><span class="prod">Class I recall: Abiomed automated Impella controller</span><span>Purge-related component defect; 37 serious injuries and 3 deaths reported. No new cardiology Class I recall was found for Oct 19–25.</span><span class="basis">Covered in <a href="001.html">No. 1</a>.</span></div></li>
+      <li><span class="date">Aug 28</span><div class="body"><span class="prod">Mounjaro (tirzepatide, Lilly): new indication</span><span>Reduce MACE in adults with type 2 diabetes at high cardiovascular risk.</span><span class="basis">SURPASS-CVOT. <a href="https://investor.lilly.com/news-releases/news-release-details/fda-approves-lillys-mounjaro-tirzepatide-reduce-cardiovascular">Lilly</a></span></div></li>
+    </ol>
+  </section>
+
+  <div class="part" id="by-topic">
+    <h2>By Topic</h2>
+  </div>
+
+  <section id="coronary">
+    <header>
+      <span class="label">Coronary &amp; prevention</span>
+      <h2>Coronary &amp; prevention</h2>
+    </header>
+
+    <article class="trial">
+      <div class="head">
+        <div class="row"><span class="src">Circulation · Oct 19, 2026 · PMID 42895015</span></div>
+        <h3><a href="https://doi.org/10.1161/CIRCULATIONAHA.126.080866">ICare-FASTER: point-of-care high-sensitivity troponin in the emergency department</a></h3>
+      </div>
+      <p class="bottom"><span class="label">Bottom line</span>A point-of-care hs-cTnI assay inside an established single-sample rule-out pathway saves about 45 minutes per chest-pain visit with no loss of safety. The gain is in throughput, not outcomes, and it depends on a validated assay and pathway.</p>
+      <dl class="facts">
+        <dt>Design</dt><dd>Pragmatic stepped-wedge cluster-randomized trial at 6 New Zealand sites, Feb 2023 – Jan 2025; 59,980 ED presentations (44,747 people)</dd>
+        <dt>Population</dt><dd>Adults with possible MI in the ED; mean age 61, 49.5% female</dd>
+        <dt>Comparison</dt><dd>Accelerated diagnostic pathway with whole-blood point-of-care hs-cTnI vs the same pathway with central-lab hs-cTn</dd>
+        <dt>Primary endpoint</dt><dd>ED length of stay <span class="num">−13%</span> (9–16%), or −47 minutes (33–61) from a mean of 376 minutes</dd>
+        <dt>Safety</dt><dd>30-day MI or cardiac death 0.39% vs 0.39%</dd>
+      </dl>
+    </article>
+
+    <article class="trial">
+      <div class="head">
+        <div class="row"><span class="src">JACC: Cardiovascular Interventions · Oct 22, 2026 · PMID 42925297</span></div>
+        <h3><a href="https://doi.org/10.1016/j.jcin.2026.08.025">OPTION-STEMI: immediate vs staged complete revascularization by age</a></h3>
+      </div>
+      <div class="forest" aria-label="Death, MI or unplanned revascularization at 1 year in patients 70 or older, hazard ratio 1.68, 95% CI 1.06 to 2.69">
+        <svg viewBox="0 0 320 58" role="img">
+          <text class="side" x="20" y="10">Favors immediate</text><text class="side" x="300" y="10" text-anchor="end">Favors staged</text>
+          <line class="axis" x1="20" y1="40" x2="300" y2="40"/>
+          <line class="unity" x1="128.3" y1="14" x2="128.3" y2="40"/>
+          <line class="ci" x1="137.4" y1="26" x2="283.1" y2="26"/>
+          <rect class="pt" x="205.4" y="22" width="8" height="8"/>
+          <text class="tick" x="20" y="52" text-anchor="middle">0.5</text><text class="tick" x="128.3" y="52" text-anchor="middle">1.0</text><text class="tick" x="191.7" y="52" text-anchor="middle">1.5</text><text class="tick" x="236.6" y="52" text-anchor="middle">2.0</text><text class="tick" x="300" y="52" text-anchor="middle">3.0</text>
+        </svg>
+      </div>
+      <p class="bottom"><span class="label">Bottom line</span>In patients 70 or older, stage the non-culprit PCI during the same admission rather than doing it at the index procedure. This is a post hoc subgroup, so it generates a hypothesis, but it agrees with last week's meta-analysis favouring staged PCI. Funded partly by Boston Scientific.</p>
+      <dl class="facts">
+        <dt>Design</dt><dd>Post hoc age analysis of a randomized trial; N=994; 1 year</dd>
+        <dt>Population</dt><dd>STEMI with multivessel disease</dd>
+        <dt>Comparison</dt><dd>Immediate (index-procedure) vs in-hospital staged complete revascularization</dd>
+        <dt>Primary endpoint</dt><dd>Death, MI or unplanned revascularization. Age ≥70: <span class="num">22.3% vs 13.8%</span>, HR 1.68 (1.06–2.69). Age &lt;70: 6.8% vs 8.4%, HR 0.80 (0.45–1.45).</dd>
+        <dt>Interaction</dt><dd>p=0.015 with age as a continuous variable; risk with immediate CR rose from about age 67</dd>
+      </dl>
+    </article>
+  </section>
+
+  <section id="hf">
+    <header>
+      <span class="label">Heart failure &amp; cardiomyopathy</span>
+      <h2>Heart failure &amp; cardiomyopathy</h2>
+    </header>
+
+    <article class="trial">
+      <div class="head">
+        <div class="row"><span class="src">JAMA · Oct 24, 2026 · PMID 42925557</span></div>
+        <h3><a href="https://doi.org/10.1001/jama.2026.19921">SGLT2 inhibitors and haemoglobin, iron and erythropoiesis: meta-analysis of 85 RCTs</a></h3>
+      </div>
+      <p class="bottom"><span class="label">Bottom line</span>Expect about +0.6 g/dL haemoglobin and +2–3% haematocrit after starting an SGLT2 inhibitor. EPO rises too, so this reflects erythropoiesis rather than just haemoconcentration, and a modest rise on treatment should not prompt an erythrocytosis work-up. Transferrin saturation falls slightly, which matters when reading iron studies in HF.</p>
+      <dl class="facts">
+        <dt>Design</dt><dd>Systematic review and random-effects meta-analysis of 85 double-blind RCTs; N=70,543; median 24 weeks</dd>
+        <dt>Population</dt><dd>Cardiovascular disease, diabetes, heart failure or CKD</dd>
+        <dt>Comparison</dt><dd>SGLT2 inhibitor vs placebo (78 trials) or active comparator (7)</dd>
+        <dt>Primary endpoint</dt><dd>Haemoglobin <span class="num">+0.60 g/dL</span> (0.55–0.66); haematocrit +2.36% (2.19–2.52)</dd>
+        <dt>Secondary</dt><dd>EPO +2.11 mIU/mL (0.50–3.71); transferrin saturation −0.84% (−1.21 to −0.47)</dd>
+      </dl>
+    </article>
+  </section>
+
+  <section id="ep">
+    <header>
+      <span class="label">Electrophysiology</span>
+      <h2>Electrophysiology</h2>
+    </header>
+
+    <article class="trial">
+      <div class="head">
+        <div class="row"><span class="src">Heart Rhythm · Oct 22, 2026 · PMID 42913986</span></div>
+        <h3><a href="https://doi.org/10.1016/j.hrthm.2026.10.039">Catheter ablation vs sham for symptomatic AF: Bayesian meta-analysis of randomized trials</a></h3>
+      </div>
+      <p class="bottom"><span class="label">Bottom line</span>The quality-of-life gain from AF ablation is not just placebo, though its size is uncertain: heterogeneity was high, mostly from PVI-SHAM-AF. This supports offering ablation for symptom relief. Certainty is low for quality of life and moderate for recurrence.</p>
+      <dl class="facts">
+        <dt>Design</dt><dd>Systematic review and Bayesian random-effects meta-analysis; 4 sham-controlled RCTs (n=468), 3 pooled (n=448)</dd>
+        <dt>Population</dt><dd>Symptomatic atrial fibrillation</dd>
+        <dt>Comparison</dt><dd>Catheter ablation vs sham procedure</dd>
+        <dt>Primary endpoint</dt><dd>AFEQT <span class="num">+13.5 points</span> (95% CrI 1.6–26.9); probability of exceeding the 5-point minimal important difference 0.94. Without PVI-SHAM-AF: +18.9 (6.7–31.4).</dd>
+        <dt>Recurrence</dt><dd>AF recurrence RR 0.49 (0.17–0.89), lower with ablation in every trial; I² 85% for quality of life</dd>
+      </dl>
+    </article>
+
+    <article class="trial">
+      <div class="head">
+        <div class="row"><span class="src">Heart Rhythm · Oct 23, 2026 · PMID 42909425</span></div>
+        <h3><a href="https://doi.org/10.1016/j.hrthm.2026.09.038">Q-INDEX: very high-power short-duration vs ablation-index-guided vs hybrid PVI</a></h3>
+      </div>
+      <p class="bottom"><span class="label">Bottom line</span>Uniform 90 W/4 s ablation more than halves ablation time but may cost durability; a hybrid approach, with ablation-index lesions on the thick anterior wall, keeps most of the speed. The trial was powered only for ablation time, so the efficacy differences are exploratory.</p>
+      <dl class="facts">
+        <dt>Design</dt><dd>Multicenter, open-label RCT, 1:1:1; N=150; Korea; 1 year</dd>
+        <dt>Population</dt><dd>Paroxysmal AF, first PVI with the QDOT MICRO catheter</dd>
+        <dt>Comparison</dt><dd>Ablation-index-guided vs hybrid vs uniform 90 W/4 s</dd>
+        <dt>Primary endpoint</dt><dd>Total ablation time <span class="num">2,220 vs 1,450 vs 794 s</span> (p&lt;0.001)</dd>
+        <dt>Efficacy &amp; safety</dt><dd>1-year freedom from atrial arrhythmia 92.0% vs 85.4% vs 77.6% (index-guided vs 90 W, p=0.049). No tamponade; steam pops only at 90 W; 2 minor strokes, both in the 90 W arm.</dd>
+      </dl>
+    </article>
+  </section>
+
+  <section id="structural">
+    <header>
+      <span class="label">Structural &amp; valvular</span>
+      <h2>Structural &amp; valvular</h2>
+    </header>
+
+    <article class="trial">
+      <div class="head">
+        <div class="row"><span class="src">EuroIntervention · Oct 19, 2026 · PMID 42910974</span></div>
+        <h3><a href="https://doi.org/10.4244/EIJ-D-26-00602">Coronary artery disease management before TAVI: meta-analysis of randomized trials</a></h3>
+      </div>
+      <p class="bottom"><span class="label">Bottom line</span>Routine PCI of significant CAD around TAVI reduces ischaemic events at the cost of more major bleeding; physiology-guided PCI ranked best in the network analysis. Weigh the patient's bleeding risk. Only 4 trials contribute to the pooled estimate.</p>
+      <dl class="facts">
+        <dt>Design</dt><dd>Pairwise and network meta-analysis; 5 RCTs (N=1,644), 4 in the primary synthesis (N=1,476)</dd>
+        <dt>Population</dt><dd>Severe aortic stenosis undergoing TAVI with significant CAD</dd>
+        <dt>Comparison</dt><dd>Routine PCI (angiography- or physiology-guided) vs conservative management</dd>
+        <dt>Primary endpoint</dt><dd>MACE <span class="num">RR 0.80</span> (0.65–0.98); unplanned revascularization RR 0.30 (0.11–0.83)</dd>
+        <dt>Safety</dt><dd>Major bleeding RR 1.57 (1.07–2.32)</dd>
+      </dl>
+    </article>
+  </section>
+
+  <section id="imaging">
+    <header>
+      <span class="label">Imaging, vascular &amp; other</span>
+      <h2>Imaging, vascular &amp; other</h2>
+    </header>
+
+    <article class="trial">
+      <div class="head">
+        <div class="row"><span class="src">EuroIntervention · Oct 19, 2026 · PMID 42910977</span></div>
+        <h3><a href="https://doi.org/10.4244/EIJ-D-26-00454">SPIRARE II: Vertex aspiration thrombectomy in intermediate-risk pulmonary embolism</a></h3>
+      </div>
+      <p class="bottom"><span class="label">Bottom line</span>Another aspiration device meets its surrogate performance goals. Single-arm and imaging-based, it cannot tell us whether thrombectomy beats anticoagulation alone in intermediate-risk PE; that awaits the randomized trials.</p>
+      <dl class="facts">
+        <dt>Design</dt><dd>Prospective, single-arm, multicenter pivotal trial at 19 US and European sites; N=123</dd>
+        <dt>Population</dt><dd>Acute intermediate-risk PE (≤14 days), CT RV/LV ratio &gt;0.9, systolic BP ≥90 mmHg</dd>
+        <dt>Comparison</dt><dd>Vertex Pulmonary Embolectomy System against prespecified performance goals</dd>
+        <dt>Primary endpoint</dt><dd>RV/LV ratio <span class="num">1.44 → 1.05</span> at 48 hours (mean −0.39)</dd>
+        <dt>Safety</dt><dd>48-hour major adverse events 2.4% (3/123)</dd>
+      </dl>
+    </article>
+  </section>
+
+  <section id="radar">
+    <header>
+      <span class="label">On the radar</span>
+      <h2>On the radar</h2>
+    </header>
+    <ul class="radar">
+      <li><span class="what">A common CD36 variant drives more DCM in people of African ancestry than TTN</span><span>Among 82,623 people, CD36 Y325* homozygotes had OR 4.8 for DCM; population attributable fraction 9.0% vs 3.7% for TTN truncating variants. Relevant to genetic evaluation of DCM in patients of African ancestry.</span><span class="meta">JAMA · Oct 19 · <a class="mono" href="https://doi.org/10.1001/jama.2026.18449">doi:10.1001/jama.2026.18449</a></span></li>
+      <li><span class="what">Heart structure after preeclampsia: meta-analysis of 45 echo studies</span><span>Reduced global longitudinal strain persisted up to 10 years postpartum, with preserved LVEF.</span><span class="meta">JACC Heart Fail · Oct 22 · <a class="mono" href="https://doi.org/10.1016/j.jchf.2026.103421">doi:10.1016/j.jchf.2026.103421</a></span></li>
+      <li><span class="what">PELICAN: cardiac index-guided haemodynamics in major abdominal surgery (n=1,095)</span><span>No reduction in 7-day complications or death (44.3% vs 46.9%; RR 0.94, 0.83–1.08).</span><span class="meta">JAMA · Oct 19 · <a class="mono" href="https://doi.org/10.1001/jama.2026.18574">doi:10.1001/jama.2026.18574</a></span></li>
+      <li><span class="what">MIRACLE-AF: recurrent events with village doctor-led telemedicine AF care</span><span>Recurrent nonfatal cardiovascular events HR 0.76 (0.58–1.00). Secondary analysis of a cluster RCT.</span><span class="meta">Heart Rhythm · Oct 22 · <a class="mono" href="https://doi.org/10.1016/j.hrthm.2026.10.037">doi:10.1016/j.hrthm.2026.10.037</a></span></li>
+      <li><span class="what">BEAT-AF pilot: wearable median-nerve stimulation (n=31)</span><span>Fewer premature atrial contractions and better EHRA symptom scores; AF burden not significantly changed.</span><span class="meta">Heart Rhythm · Oct 22 · <a class="mono" href="https://doi.org/10.1016/j.hrthm.2026.10.038">doi:10.1016/j.hrthm.2026.10.038</a></span></li>
+      <li><span class="what">Ventricular arrhythmia timing in ACS treated with PCI (49,963 patients)</span><span>VT/VF raised short-term mortality (OR 5.04) but not later mortality in 30-day survivors (OR 0.97).</span><span class="meta">Heart Rhythm · Oct 22 · <a class="mono" href="https://doi.org/10.1016/j.hrthm.2026.10.040">doi:10.1016/j.hrthm.2026.10.040</a></span></li>
+      <li><span class="what">MISSION reBEAT: soft-robotic biventricular support without blood contact (n=10)</span><span>First-in-human feasibility before LVAD implantation.</span><span class="meta">Eur J Heart Fail · Oct 22 · <a class="mono" href="https://doi.org/10.1093/ejhf/xuag331">doi:10.1093/ejhf/xuag331</a></span></li>
+      <li><span class="what">Medicare Advantage in-home risk assessments</span><span>A growing share of cardiovascular diagnoses is made at in-home visits, with lower treatment rates afterwards.</span><span class="meta">Ann Intern Med · Oct 20 · <a class="mono" href="https://doi.org/10.7326/ANNALS-26-01366">doi:10.7326/ANNALS-26-01366</a></span></li>
+      <li><span class="what">Now in print: LIBREXIA-ACS and tailored antibiotic duration for endocarditis</span><span>Both were online in NEJM since ESC in August, so they fall outside this window; this week's print issue adds an editorial on each.</span><span class="meta">NEJM · <a class="mono" href="https://doi.org/10.1056/NEJMoa2608717">doi:10.1056/NEJMoa2608717</a> · <a class="mono" href="https://doi.org/10.1056/NEJMoa2607887">doi:10.1056/NEJMoa2607887</a></span></li>
+      <li><span class="what">AHA/AAP/ACOG/SMFM statement on female-specific CV prevention</span><span>Published Oct 26, just after the window; covered next week.</span><span class="meta">Circulation · <a class="mono" href="https://doi.org/10.1161/CIR.0000000000001482">doi:10.1161/CIR.0000000000001482</a></span></li>
+      <li><span class="what">Coming up</span><span>TCT 2026, San Diego, Oct 31 – Nov 3: P4, TRANSFORM II, HD-PCI, PROGRESS, CLASP II TR at 1 year, SIMPLAAFY and TRAVEL III. Then AHA 2026 in November, with full Lp(a)HORIZON data.</span></li>
+    </ul>
+  </section>
+
+  <footer>
+    <p><b>Method.</b> PubMed searches (Entrez date Oct 18–26, 2026) across tier-listed journals for randomized trials, meta-analyses, guidelines and statements, by domain, plus a sweep of all cardiovascular items in NEJM, Lancet, JAMA, BMJ, Nature Medicine, Annals and JAMA Internal Medicine. Web checks covered FDA approvals and recalls over the trailing 60 days, guideline releases, congress late-breakers and the TCT 2026 programme. Every journal entry has a PubMed-verified PMID or DOI with an online date of Oct 19–25. Items reported only in news or company releases this week, such as Launch-HTN CKD data for lorundrostat and ENRICH-AF, could not be matched to a peer-reviewed paper and were left out. Regulatory items cite FDA, company or news sources.</p>
+  </footer>
+</div>
+</body>
+</html>
