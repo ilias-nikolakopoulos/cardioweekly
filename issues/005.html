@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CardioWeekly · Nov 1, 2026</title>
+<style>
+/* Layout: single reading column, masthead with ECG trace, sticky section nav, trial "cards" as clinical abstracts with a mini forest plot */
+:root{
+  --bg:#f5f7f9; --surface:#ffffff; --ink:#15212c; --muted:#5a6774; --line:#dde3e9;
+  --accent:#a3243a; --accent-soft:#f7e6e9; --reg:#1f5f7a; --reg-soft:#e3eff4;
+  --yes:#1d7a4a; --yes-soft:#e2f2e9; --no:#6b7480; --no-soft:#eceff2; --warn:#9a5b00; --warn-soft:#fbefd9;
+  --f-display:"Helvetica Neue", Helvetica, Arial, sans-serif;
+  --f-body:"Helvetica Neue", Helvetica, Arial, sans-serif;
+  --f-mono:"Helvetica Neue", Helvetica, Arial, sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f151b; --surface:#161e26; --ink:#e4e9ee; --muted:#97a3af; --line:#26313c;
+  --accent:#ef6f84; --accent-soft:#3a1d24; --reg:#7cc0dc; --reg-soft:#14303c;
+  --yes:#6fd19c; --yes-soft:#163326; --no:#a2acb7; --no-soft:#222b34; --warn:#f0b25a; --warn-soft:#382a12;
+  color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#0f151b; --surface:#161e26; --ink:#e4e9ee; --muted:#97a3af; --line:#26313c;
+  --accent:#ef6f84; --accent-soft:#3a1d24; --reg:#7cc0dc; --reg-soft:#14303c;
+  --yes:#6fd19c; --yes-soft:#163326; --no:#a2acb7; --no-soft:#222b34; --warn:#f0b25a; --warn-soft:#382a12;
+  color-scheme:dark;}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;padding-inline:16px;padding-block:0 64px}
+.wrap{max-width:860px;margin:0 auto}
+a{color:var(--accent);text-underline-offset:2px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;text-wrap:balance;margin:0;line-height:1.2}
+p{margin:0}
+.mono{font-family:var(--f-mono);font-size:.82em}
+.label{font-size:.72rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+
+/* Masthead */
+.mast{padding-block:40px 20px;display:grid;gap:10px}
+.mast .eyebrow{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.mast .dot{width:9px;height:9px;border-radius:50%;background:var(--ink);flex:none}
+.mast h1{font-size:clamp(2.4rem,7vw,3.6rem);letter-spacing:-.025em}
+.mast h1 span{color:var(--accent)}
+.mast .week{font-family:var(--f-display);font-style:italic;font-size:1.2rem;color:var(--muted)}
+.ecg{width:100%;height:46px;display:block;margin-top:6px}
+.ecg path{fill:none;stroke:var(--accent);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
+@media (prefers-reduced-motion:no-preference){
+  .ecg path{stroke-dasharray:1400;stroke-dashoffset:0;animation:trace 2.4s ease-out both}
+  @keyframes trace{from{stroke-dashoffset:1400}to{stroke-dashoffset:0}}
+}
+
+/* Nav */
+nav.toc{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding-block:10px;margin-bottom:28px}
+nav.toc ul{list-style:none;margin:0;padding:0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+nav.toc a{display:block;white-space:nowrap;font-size:.84rem;font-weight:500;color:var(--muted);text-decoration:none;padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:var(--surface)}
+nav.toc a:hover{color:var(--ink);border-color:var(--muted)}
+nav.toc a.arch{color:var(--accent);border-color:var(--accent)}
+
+section{display:grid;gap:18px;margin-bottom:52px;scroll-margin-top:70px}
+section > header{display:grid;gap:4px}
+section h2{font-size:1.65rem}
+.lede{color:var(--muted);max-width:65ch}
+
+/* Part divider */
+.part{border-top:2px solid var(--ink);padding-top:18px;margin-bottom:32px;scroll-margin-top:70px}
+.part h2{font-size:clamp(2rem,5.5vw,2.75rem);letter-spacing:-.01em}
+
+/* Quiet-week banner */
+.banner{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:18px 20px;display:grid;gap:6px}
+.banner strong{font-family:var(--f-display);font-size:1.15rem;font-weight:600}
+
+/* Takeaways */
+.takeaways{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.takeaways li{display:grid;grid-template-columns:9rem 1fr;gap:14px;align-items:start;padding-block:12px;border-top:1px solid var(--line)}
+.takeaways li:first-child{border-top:0}
+.tag{display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:4px;white-space:nowrap}
+.tag.reg{background:var(--reg-soft);color:var(--reg)}
+.tag.safety{background:var(--warn-soft);color:var(--warn)}
+.tag.trial{background:var(--accent-soft);color:var(--accent)}
+.tag.yes{background:var(--yes-soft);color:var(--yes)}
+.tag.no{background:var(--no-soft);color:var(--no)}
+.takeaways li > div{min-width:0}
+.takeaways .t{min-width:0}
+
+/* Guidelines */
+.docs{display:grid;gap:14px}
+.doc{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:grid;gap:8px;min-width:0}
+.doc h3{font-size:1.08rem}
+.doc .meta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.84rem;color:var(--muted)}
+.caveat{border-left:3px solid var(--warn);background:var(--warn-soft);padding:10px 14px;border-radius:0 6px 6px 0;font-size:.93rem}
+.caveat b{color:var(--warn)}
+
+/* FDA timeline */
+.timeline{list-style:none;margin:0;padding:0;display:grid}
+.timeline li{display:grid;grid-template-columns:96px 1fr;gap:16px;padding-block:14px;border-top:1px solid var(--line)}
+.timeline li:first-child{border-top:0}
+.timeline .date{font-family:var(--f-mono);font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums;padding-top:2px}
+.timeline .body{min-width:0;display:grid;gap:3px}
+.timeline .prod{font-weight:600}
+.timeline .basis{font-size:.9rem;color:var(--muted)}
+.timeline li.recall .prod{color:var(--warn)}
+
+/* Trials */
+.trial{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;min-width:0}
+.trial .head{padding:20px 22px 14px;display:grid;gap:8px}
+.trial .head .row{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between}
+.trial h3{font-size:1.3rem}
+.trial h3 a{color:inherit;text-decoration:none}
+.trial h3 a:hover{text-decoration:underline;text-decoration-color:var(--accent)}
+.trial .src{font-size:.86rem;color:var(--muted)}
+.bottom{margin:0 22px 16px;padding:12px 16px;background:var(--bg);border-radius:8px;font-size:.96rem}
+.bottom .label{display:block;margin-bottom:2px;color:var(--accent)}
+dl.facts{margin:0;display:grid;grid-template-columns:170px 1fr;border-top:1px solid var(--line)}
+dl.facts dt,dl.facts dd{padding:10px 22px;border-bottom:1px solid var(--line);margin:0}
+dl.facts dt{font-size:.74rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding-top:13px;padding-right:0}
+dl.facts dd{min-width:0;font-size:.95rem;font-variant-numeric:tabular-nums}
+dl.facts > :nth-last-child(-n+2){border-bottom:0}
+.num{font-weight:600}
+
+/* Forest plot */
+.forest{padding:6px 22px 16px}
+.forest svg{width:100%;max-width:420px;height:auto;display:block}
+.forest .axis{stroke:var(--line);stroke-width:1}
+.forest .tick{fill:var(--muted);font-family:var(--f-mono);font-size:9px}
+.forest .unity{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3}
+.forest .ci{stroke:var(--ink);stroke-width:2}
+.forest .pt{fill:var(--accent)}
+.forest .margin{stroke:var(--warn);stroke-width:1.2;stroke-dasharray:4 3}
+.forest .mlabel{fill:var(--warn);font-family:var(--f-body);font-size:9px;font-weight:600}
+.forest .side{fill:var(--muted);font-family:var(--f-body);font-size:9px}
+
+.empty{color:var(--muted);font-size:.95rem;padding:14px 18px;border:1px dashed var(--line);border-radius:10px}
+
+/* Radar */
+.radar{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.radar li{padding-block:12px;border-top:1px solid var(--line);display:grid;gap:3px}
+.radar li:first-child{border-top:0}
+.radar .what{font-weight:600}
+.radar .meta{font-size:.84rem;color:var(--muted)}
+
+footer{color:var(--muted);font-size:.84rem;border-top:1px solid var(--line);padding-top:18px;max-width:70ch}
+
+@media (max-width:620px){
+  dl.facts{grid-template-columns:1fr}
+  dl.facts dt{border-bottom:0;padding-bottom:0}
+  dl.facts dd{padding-top:2px}
+  .timeline li{grid-template-columns:1fr;gap:4px}
+  .takeaways li{grid-template-columns:1fr;gap:6px}
+  .trial .head,.forest{padding-inline:16px}
+  .bottom{margin-inline:16px}
+  dl.facts dt,dl.facts dd{padding-inline:16px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="mast">
+    <div class="eyebrow">
+      <span class="label">Practice-changing cardiology, every Sunday</span>
+      <span class="dot" aria-hidden="true"></span>
+      <span class="label">Issue No. 5 · Sunday, Nov 1, 2026</span>
+    </div>
+    <h1>Cardio<span>Weekly</span></h1>
+    <p class="week">Week of Oct 26 – Nov 1, 2026</p>
+    <svg class="ecg" viewBox="0 0 860 46" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 30 H120 l8 -4 l8 4 H160 l4 4 l6 -30 l6 38 l5 -12 H220 q14 -10 28 0 H360 l8 -4 l8 4 H400 l4 4 l6 -30 l6 38 l5 -12 H460 q14 -10 28 0 H600 l8 -4 l8 4 H640 l4 4 l6 -30 l6 38 l5 -12 H700 q14 -10 28 0 H860"/>
+    </svg>
+  </header>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#takeaways">Key takeaways</a></li>
+      <li><a href="#guidelines">Guidelines</a></li>
+      <li><a href="#fda">FDA</a></li>
+      <li><a href="#congress">Congress watch</a></li>
+      <li><a href="#by-topic">By Topic</a></li>
+      <li><a href="#radar">On the radar</a></li>
+      <li><a class="arch" href="../archive.html">Archive</a></li>
+    </ul>
+  </nav>
+
+  <section id="takeaways">
+    <header>
+      <h2>Key takeaways</h2>
+      <p class="lede">TCT 2026 ran from Oct 31 to Nov 3, across the end of the window, so Congress Watch includes papers published through Nov 3. Three trials meet the practice-changing bar. Published Thursday, Nov 5.</p>
+    </header>
+    <ul class="takeaways">
+      <li><span class="t"><span class="tag yes">Practice-changing</span></span>
+        <div><b>TAVR for moderate AS with at-risk features (PROGRESS).</b> TAVR cut death or heart-failure events at 2 years compared with surveillance (16.7% vs 23.9%; −7.2 points, NNT about 14). The benefit came from HF events (10.8% vs 19.0%), not mortality (8.4% vs 7.3%). Open-label and Edwards-funded.</div></li>
+      <li><span class="t"><span class="tag yes">Practice-changing</span></span>
+        <div><b>After LAAO, aspirin alone is enough (SIMPLAAFY).</b> In 1,857 patients after uncomplicated LAAC, aspirin alone and reduced-dose NOAC were both non-inferior to 6 months of DAPT. Aspirin alone had the fewest events (3.3% vs 6.9%; RR 0.49) and the least major bleeding (1.7% vs 4.5%).</div></li>
+      <li><span class="t"><span class="tag yes">Practice-changing</span></span>
+        <div><b>LBBAP over RV pacing for AV block with preserved EF (LEAP-Block).</b> With expected pacing above 40%, LBBAP lowered death, HF events or biventricular upgrade at 24 months (2.4% vs 12.5%; HR 0.37, 0.19–0.73). Most of the effect was fewer HF events.</div></li>
+      <li><span class="t"><span class="tag trial">Trial</span></span>
+        <div><b>CCTA can replace IVUS for PCI planning (P4).</b> In 1,105 patients with FFR-CT ≤0.80, CCTA-guided PCI was non-inferior to IVUS-guided PCI for 12-month target-vessel failure (4.1% vs 4.6%). The margin was generous, and the trial was funded by GE HealthCare and Heartflow.</div></li>
+      <li><span class="t"><span class="tag trial">Meta-analysis</span></span>
+        <div><b>0/1 h vs 0/3 h troponin.</b> Across 110,933 presentations, the 0/1 h pathway was as safe (death or type 1 MI 0.8% vs 1.0%) but did not shorten ED stays on average (314 vs 308 minutes).</div></li>
+      <li><span class="t"><span class="tag reg">FDA</span></span>
+        <div><b>Amplatzer Paraclose PVL Occluder approved</b> (Oct 28): the first US transcatheter device designed specifically to close paravalvular leaks around surgical valves.</div></li>
+    </ul>
+  </section>
+
+  <section id="guidelines">
+    <header>
+      <span class="label">Guidelines &amp; statements</span>
+    </header>
+    <div class="docs">
+      <article class="doc">
+        <h3>Consensus Guidance for the Female-Specific Prevention and Management of Cardiovascular Disease: AHA/AAP/ACOG/SMFM Scientific Statement</h3>
+        <div class="meta"><span>Circulation · Oct 26 · PMID 42929102</span><a class="mono" href="https://doi.org/10.1161/CIR.0000000000001482">doi:10.1161/CIR.0000000000001482</a></div>
+        <p>Defines four Female Life Stages (perimenarche, ovarian cycling, perimenopause and postmenopause), with pregnancy as a modifying event, and gives consensus screening, prevention and treatment guidance for each across hormonal, psychosocial and cardiovascular health. It cross-walks existing society guidelines. Consensus guidance, with no graded class or level-of-evidence recommendations.</p>
+      </article>
+      <article class="doc">
+        <h3>A Female-Specific Life Course Approach to the Prevention and Management of Cardiovascular Disease: AHA Presidential Advisory</h3>
+        <div class="meta"><span>Circulation · Oct 26 · PMID 42929148</span><a class="mono" href="https://doi.org/10.1161/CIR.0000000000001483">doi:10.1161/CIR.0000000000001483</a></div>
+        <p>The framework and rationale behind the life-stage approach, with priorities for implementation, clinician education and policy.</p>
+      </article>
+      <article class="doc">
+        <h3>Comprehensive Centers of Excellence for Women's Cardiovascular Care: AHA Science Advisory</h3>
+        <div class="meta"><span>Circulation · Oct 26 · PMID 42929153</span><a class="mono" href="https://doi.org/10.1161/CIR.0000000000001481">doi:10.1161/CIR.0000000000001481</a></div>
+        <p>Proposes a national framework for women's cardiovascular centres built on four pillars: interdisciplinary care, training, research and community engagement.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="fda">
+    <header>
+      <h2>Regulatory news</h2>
+    </header>
+    <ol class="timeline">
+      <li><span class="date">Oct 28</span><div class="body"><span class="prod">Amplatzer Paraclose PVL Occluder (Abbott)</span><span>Transcatheter closure of paravalvular leak around surgical heart valves; the first US device designed for this. Sold in Europe as the Amplatzer Valvular Plug III since 2020.</span><span class="basis">Single-arm PARADIGM study, n=200. <a href="https://citoday.com/news/abbotts-amplatzer-paraclose-pvl-occluder-approved-by-fda">CI Today</a> · <a href="https://www.medtechdive.com/news/abbott-grows-cardiac-portfolio-with-amplatzer-approval-for-valve-leaks/873163/">MedTech Dive</a></span></div></li>
+      <li><span class="date">Oct 21</span><div class="body"><span class="prod">PASCAL Precision system for tricuspid repair (Edwards): PMA</span><span>Symptomatic severe TR at intermediate or greater surgical risk.</span><span class="basis">Covered in <a href="004.html">No. 4</a>. CLASP II TR was presented at TCT this week (see On the radar).</span></div></li>
+      <li><span class="date">Oct 19</span><div class="body"><span class="prod">PerQseal Elite vascular closure system (Haemonetics)</span><span>Large-bore arteriotomy closure after TAVR and other procedures.</span><span class="basis">Covered in <a href="004.html">No. 4</a>.</span></div></li>
+      <li><span class="date">Oct 1</span><div class="body"><span class="prod">Autus Size-Adjustable Valve</span><span>Growth-adjustable surgical pulmonary valve for children.</span><span class="basis"><a href="https://www.fda.gov/news-events/press-announcements/fda-approves-first-heart-valve-designed-grow-children">FDA</a></span></div></li>
+      <li><span class="date">Sept 28</span><div class="body"><span class="prod">Tempus ECG-MR: 510(k)</span><span>AI-ECG flag for possible moderate or severe mitral regurgitation in adults ≥65.</span><span class="basis">Covered in <a href="003.html">No. 3</a>.</span></div></li>
+      <li class="recall"><span class="date">Sept 16–24</span><div class="body"><span class="prod">Class I recall: Abiomed automated Impella controller</span><span>Purge-related component defect; 37 serious injuries and 3 deaths reported. No new cardiology Class I recall was found for Oct 26 – Nov 1.</span><span class="basis">Covered in <a href="001.html">No. 1</a>.</span></div></li>
+    </ol>
+  </section>
+
+  <section id="congress">
+    <header>
+      <span class="label">Congress watch</span>
+      <h2>TCT 2026, San Diego, Oct 31 – Nov 3</h2>
+      <p class="lede">Late-breakers with a simultaneous peer-reviewed publication. Trials presented without a paper are listed under On the radar.</p>
+    </header>
+
+    <article class="trial">
+      <div class="head">
+        <div class="row"><span class="src">NEJM · Nov 2, 2026 · PMID 42970708</span><span class="tag yes">Practice-changing</span></div>
+        <h3><a href="https://doi.org/10.1056/NEJMoa2607326">PROGRESS: TAVR vs clinical surveillance in moderate aortic stenosis</a></h3>
+      </div>
+      <p class="bottom"><span class="label">Bottom line</span>For moderate AS with symptoms or early LV damage, early TAVR prevents heart-failure events. It did not reduce mortality, and the HF endpoint includes events without hospitalization in an open-label trial. Refer symptomatic moderate AS, or moderate AS with LV damage, to the heart team rather than defaulting to surveillance; in younger patients, valve durability still weighs against early intervention. Funded by Edwards.</p>
+      <dl class="facts">
+        <dt>Design</dt><dd>International, open-label RCT, 1:1; N=744; 2 years</dd>
+        <dt>Population</dt><dd>Moderate AS (mean AVA 1.2 cm², peak velocity 3.3 m/s) with at least one at-risk feature; mean age 78, 39% women, 46% low surgical risk</dd>
+        <dt>Comparison</dt><dd>Transfemoral TAVR with a balloon-expandable valve vs clinical surveillance</dd>
+        <dt>Primary endpoint</dt><dd>Death or HF event at 2 years <span class="num">16.7% vs 23.9%</span>; risk difference −7.2 points (−13.1 to −1.3), p=0.02; NNT about 14</dd>
+        <dt>Components</dt><dd>HF events 10.8% vs 19.0%; all-cause death 8.4% vs 7.3%</dd>
+        <dt>Safety</dt><dd>Procedure-related adverse events similar to surveillance patients who later had valve replacement</dd>
+      </dl>
+    </article>
+
+    <article class="trial">
+      <div class="head">
+        <div class="row"><span class="src">JAMA · Nov 2, 2026 · PMID 42970643</span><span class="tag yes">Practice-changing</span></div>
+        <h3><a href="https://doi.org/10.1001/jama.2026.21361">SIMPLAAFY: antithrombotic therapy after left atrial appendage occlusion</a></h3>
+      </div>
+      <div class="forest" aria-label="Primary composite, aspirin alone vs DAPT, risk ratio 0.49, 95% CI 0.29 to 0.82">
+        <svg viewBox="0 0 320 58" role="img">
+          <text class="side" x="20" y="10">Favors aspirin</text><text class="side" x="300" y="10" text-anchor="end">Favors DAPT</text>
+          <line class="axis" x1="20" y1="40" x2="300" y2="40"/>
+          <line class="unity" x1="206.7" y1="14" x2="206.7" y2="40"/>
+          <line class="ci" x1="40.0" y1="26" x2="179.9" y2="26"/>
+          <rect class="pt" x="106.6" y="22" width="8" height="8"/>
+          <text class="tick" x="20.0" y="52" text-anchor="middle">0.25</text><text class="tick" x="113.3" y="52" text-anchor="middle">0.5</text><text class="tick" x="206.7" y="52" text-anchor="middle">1</text><text class="tick" x="300.0" y="52" text-anchor="middle">2</text>
+        </svg>
+      </div>
+      <p class="bottom"><span class="label">Bottom line</span>After an uncomplicated LAAC, aspirin alone is a reasonable default; DAPT adds bleeding without benefit. Consider reduced-dose NOAC when device-related thrombus risk is high, since it had the lowest DRT rate. Open-label, and secondary comparisons were not adjusted for multiplicity.</p>
+      <dl class="facts">
+        <dt>Design</dt><dd>Open-label, 3-arm, non-inferiority RCT at 87 US sites; N=1,857; 6 months</dd>
+        <dt>Population</dt><dd>Non-valvular AF after successful LAAC; mean age 76, CHA₂DS₂-VASc 4.2</dd>
+        <dt>Comparison</dt><dd>Aspirin alone for 12 months, or reduced-dose NOAC for 3 months then aspirin, vs DAPT for 6 months then aspirin</dd>
+        <dt>Primary endpoint</dt><dd>Death, stroke, systemic embolism or major bleeding: aspirin <span class="num">3.3% vs 6.9%</span> with DAPT (RR 0.49, 0.29–0.82); reduced-dose NOAC 5.1% (RR 0.75, 0.48–1.18). Both non-inferior.</dd>
+        <dt>Safety</dt><dd>Major bleeding 1.7% (aspirin), 2.7% (NOAC), 4.5% (DAPT). Device-related thrombus 2.7%, 0.9%, 3.4% (exploratory).</dd>
+      </dl>
+    </article>
+
+    <article class="trial">
+      <div class="head">
+        <div class="row"><span class="src">NEJM · Nov 1, 2026 · PMID 42969897</span></div>
+        <h3><a href="https://doi.org/10.1056/NEJMoa2610771">P4: coronary CT angiography vs intravascular ultrasound to guide PCI</a></h3>
+      </div>
+      <p class="bottom"><span class="label">Bottom line</span>A pre-procedure CCTA with FFR-CT can stand in for intravascular imaging for vessel sizing and planning, with event rates like IVUS. The 4.5-point margin is generous against an event rate of about 4.6%, and funding came from GE HealthCare and Heartflow. It suits centres already running a CCTA-first pathway; it is not a reason to drop IVUS for left main or complex lesions.</p>
+      <dl class="facts">
+        <dt>Design</dt><dd>Investigator-initiated, international, open-label non-inferiority RCT with blinded adjudication; N=1,105; 12 months</dd>
+        <dt>Population</dt><dd>Indication for revascularization, at least one lesion >70% stenosis and FFR-CT ≤0.80; median age 65, 22% women</dd>
+        <dt>Comparison</dt><dd>CCTA-guided PCI planning vs IVUS-guided PCI</dd>
+        <dt>Primary endpoint</dt><dd>Target-vessel failure <span class="num">4.1% vs 4.6%</span>; risk difference −0.42 points (−2.82 to 1.99); non-inferior (p&lt;0.001), not superior (p=0.73)</dd>
+        <dt>Safety</dt><dd>Clinical procedural complications in 6 vs 9 patients</dd>
+      </dl>
+    </article>
+  </section>
+
+  <div class="part" id="by-topic">
+    <h2>By Topic</h2>
+  </div>
+
+  <section id="coronary">
+    <header>
+      <span class="label">Coronary &amp; prevention</span>
+      <h2>Coronary &amp; prevention</h2>
+    </header>
+
+    <article class="trial">
+      <div class="head">
+        <div class="row"><span class="src">Lancet · Oct 29, 2026 · PMID 42956796</span></div>
+        <h3><a href="https://doi.org/10.1016/S0140-6736(26)01767-8">0/1 h vs 0/3 h troponin pathways: individual-patient meta-analysis of randomized trials</a></h3>
+      </div>
+      <p class="bottom"><span class="label">Bottom line</span>The guideline-endorsed 0/1 h pathway is safe but does not shorten ED stays on average. Heterogeneity was extreme, so any gain depends on the local system. Read with last week's ICare-FASTER: throughput comes from turnaround time and discharge processes, not the retest interval alone.</p>
+      <dl class="facts">
+        <dt>Design</dt><dd>Systematic review and two-stage IPD meta-analysis; 5 RCTs, 110,933 presentations</dd>
+        <dt>Population</dt><dd>Suspected myocardial infarction in the ED</dd>
+        <dt>Comparison</dt><dd>0/1 h vs 0/3 h high-sensitivity troponin pathway</dd>
+        <dt>Primary endpoint</dt><dd>30-day death or new type 1 MI <span class="num">0.8% vs 1.0%</span> (OR 0.83, 0.45–1.53). ED stay 314 vs 308 min (ratio 1.03, 0.85–1.25). Direct discharge 67.0% vs 65.8%.</dd>
+        <dt>Caveats</dt><dd>Safety estimate imprecise; I² 63% for safety and 99% for ED stay; the safety outcome was refined after data receipt</dd>
+      </dl>
+    </article>
+
+    <article class="trial">
+      <div class="head">
+        <div class="row"><span class="src">Circ Cardiovasc Interv · Oct 31, 2026 · PMID 42965935</span></div>
+        <h3><a href="https://doi.org/10.1161/CIRCINTERVENTIONS.126.017029">BRIGHT-4 at 1 year: bivalirudin with a high-dose post-PCI infusion vs heparin in STEMI</a></h3>
+      </div>
+      <div class="forest" aria-label="Death or BARC 3 to 5 bleeding at 12 months, hazard ratio 0.73, 95% CI 0.58 to 0.92">
+        <svg viewBox="0 0 320 58" role="img">
+          <text class="side" x="20" y="10">Favors bivalirudin</text><text class="side" x="300" y="10" text-anchor="end">Favors heparin</text>
+          <line class="axis" x1="20" y1="40" x2="300" y2="40"/>
+          <line class="unity" x1="160.0" y1="14" x2="160.0" y2="40"/>
+          <line class="ci" x1="50.0" y1="26" x2="143.2" y2="26"/>
+          <rect class="pt" x="92.4" y="22" width="8" height="8"/>
+          <text class="tick" x="20.0" y="52" text-anchor="middle">0.5</text><text class="tick" x="160.0" y="52" text-anchor="middle">1</text><text class="tick" x="241.9" y="52" text-anchor="middle">1.5</text><text class="tick" x="300.0" y="52" text-anchor="middle">2</text>
+        </svg>
+      </div>
+      <p class="bottom"><span class="label">Bottom line</span>The 30-day benefit of bivalirudin with a full-dose post-PCI infusion holds at 1 year. A reasonable choice for radial primary PCI where bivalirudin is available; the infusion is what protects against acute stent thrombosis. Single-country and open-label.</p>
+      <dl class="facts">
+        <dt>Design</dt><dd>Multicenter, open-label RCT in China; N=6,016; 12-month follow-up</dd>
+        <dt>Population</dt><dd>STEMI undergoing primary PCI via radial access</dd>
+        <dt>Comparison</dt><dd>Bivalirudin plus a high-dose infusion for 2–4 hours after PCI vs heparin monotherapy</dd>
+        <dt>Primary endpoint</dt><dd>Death or BARC 3–5 bleeding <span class="num">4.1% vs 5.6%</span>, HR 0.73 (0.58–0.92); −1.5 points</dd>
+        <dt>Secondary</dt><dd>BARC 3–5 bleeding 0.6% vs 1.2% (HR 0.49); stent thrombosis 0.8% vs 1.3% (HR 0.60); death 3.8% vs 4.8% (HR 0.80, 0.63–1.02)</dd>
+      </dl>
+    </article>
+  </section>
+
+  <section id="hf">
+    <header>
+      <span class="label">Heart failure &amp; cardiomyopathy</span>
+      <h2>Heart failure &amp; cardiomyopathy</h2>
+    </header>
+
+    <p class="empty">No trial in the window met the inclusion bar. The HELIOS-B open-label extension is under On the radar.</p>
+  </section>
+
+  <section id="ep">
+    <header>
+      <span class="label">Electrophysiology</span>
+      <h2>Electrophysiology</h2>
+    </header>
+
+    <article class="trial">
+      <div class="head">
+        <div class="row"><span class="src">JAMA · Oct 28, 2026 · PMID 42949742</span><span class="tag yes">Practice-changing</span></div>
+        <h3><a href="https://doi.org/10.1001/jama.2026.18146">LEAP-Block: left bundle-branch area pacing vs right ventricular pacing for AV block</a></h3>
+      </div>
+      <div class="forest" aria-label="Primary composite, hazard ratio 0.37, 95% CI 0.19 to 0.73">
+        <svg viewBox="0 0 320 58" role="img">
+          <text class="side" x="20" y="10">Favors LBBAP</text><text class="side" x="300" y="10" text-anchor="end">Favors RV pacing</text>
+          <line class="axis" x1="20" y1="40" x2="300" y2="40"/>
+          <line class="unity" x1="235.2" y1="14" x2="235.2" y2="40"/>
+          <line class="ci" x1="80.0" y1="26" x2="205.8" y2="26"/>
+          <rect class="pt" x="138.3" y="22" width="8" height="8"/>
+          <text class="tick" x="20.0" y="52" text-anchor="middle">0.1</text><text class="tick" x="105.6" y="52" text-anchor="middle">0.25</text><text class="tick" x="170.4" y="52" text-anchor="middle">0.5</text><text class="tick" x="235.2" y="52" text-anchor="middle">1</text><text class="tick" x="300.0" y="52" text-anchor="middle">2</text>
+        </svg>
+      </div>
+      <p class="bottom"><span class="label">Bottom line</span>In patients who will pace a lot, LBBAP prevents heart-failure events compared with RV pacing, so it should be the first choice for high-burden pacing where operators have the skills. The effect came mainly from fewer HF events, with no difference in death, and the trial was single-country and modest-sized.</p>
+      <dl class="facts">
+        <dt>Design</dt><dd>Multicenter RCT at 14 Chinese hospitals; 499 randomized, 482 analysed; 24 months</dd>
+        <dt>Population</dt><dd>AV block, LVEF ≥50%, expected ventricular pacing &gt;40%; mean age 67, 46% women</dd>
+        <dt>Comparison</dt><dd>LBBAP vs RV pacing</dd>
+        <dt>Primary endpoint</dt><dd>Death, HF event or upgrade to biventricular pacing <span class="num">2.4% vs 12.5%</span> (−10.1 points); Kaplan-Meier 5.0% vs 13.2%, HR 0.37 (0.19–0.73); NNT about 10</dd>
+        <dt>Secondary</dt><dd>HF events 3.4% vs 11.3%; no difference in death, BiV upgrade, pacing-induced cardiomyopathy or device complications</dd>
+        <dt>Procedure</dt><dd>Acute success 97.9% vs 99.6%; left bundle-branch capture confirmed in 80%</dd>
+      </dl>
+    </article>
+  </section>
+
+  <section id="structural">
+    <header>
+      <span class="label">Structural &amp; valvular</span>
+      <h2>Structural &amp; valvular</h2>
+    </header>
+
+    <article class="trial">
+      <div class="head">
+        <div class="row"><span class="src">Circulation · Oct 31, 2026 · PMID 42965504</span></div>
+        <h3><a href="https://doi.org/10.1161/CIRCULATIONAHA.126.082827">SEASON-AR: TAVR vs medical therapy for severe pure aortic regurgitation</a></h3>
+      </div>
+      <div class="forest" aria-label="Primary composite at 1 year, hazard ratio 0.31, 95% CI 0.14 to 0.66">
+        <svg viewBox="0 0 320 58" role="img">
+          <text class="side" x="20" y="10">Favors TAVR</text><text class="side" x="300" y="10" text-anchor="end">Favors GDMT</text>
+          <line class="axis" x1="20" y1="40" x2="300" y2="40"/>
+          <line class="unity" x1="235.2" y1="14" x2="235.2" y2="40"/>
+          <line class="ci" x1="51.4" y1="26" x2="196.4" y2="26"/>
+          <rect class="pt" x="121.7" y="22" width="8" height="8"/>
+          <text class="tick" x="20.0" y="52" text-anchor="middle">0.1</text><text class="tick" x="105.6" y="52" text-anchor="middle">0.25</text><text class="tick" x="170.4" y="52" text-anchor="middle">0.5</text><text class="tick" x="235.2" y="52" text-anchor="middle">1</text><text class="tick" x="300.0" y="52" text-anchor="middle">2</text>
+        </svg>
+      </div>
+      <p class="bottom"><span class="label">Bottom line</span>The first randomized evidence that TAVR helps patients with pure AR who cannot have surgery, driven by fewer HF admissions. It is small, open-label and used a device not available in the US; for now, it supports referral to centres with dedicated AR valves or trials rather than off-label TAVR.</p>
+      <dl class="facts">
+        <dt>Design</dt><dd>Investigator-initiated, open-label RCT at 18 Chinese centres; N=210; 1 year</dd>
+        <dt>Population</dt><dd>Severe pure AR, surgery high-risk or declined</dd>
+        <dt>Comparison</dt><dd>Transfemoral TAVR (VitaFlow) plus GDMT vs GDMT alone</dd>
+        <dt>Primary endpoint</dt><dd>Death, disabling stroke or HF rehospitalization <span class="num">8.3% vs 24.8%</span>, HR 0.31 (0.14–0.66); HF rehospitalization 3.7% vs 21.3%</dd>
+        <dt>Safety</dt><dd>More major or life-threatening bleeding and new pacemakers with TAVR, mostly within 30 days</dd>
+      </dl>
+    </article>
+
+    <article class="trial">
+      <div class="head">
+        <div class="row"><span class="src">JACC · Nov 3, 2026 (during TCT) · PMID 42980634</span></div>
+        <h3><a href="https://doi.org/10.1016/j.jacc.2026.10.055">SINGLE-CLOSURE: one vs two ProGlide sutures after transfemoral TAVR</a></h3>
+      </div>
+      <p class="bottom"><span class="label">Bottom line</span>One ProGlide is enough for most TAVR access, with bail-out closure devices kept at hand. Most events were minor.</p>
+      <dl class="facts">
+        <dt>Design</dt><dd>Open-label non-inferiority RCT at 25 Chinese centres; N=876</dd>
+        <dt>Population</dt><dd>Age ≥65 undergoing transfemoral TAVR</dd>
+        <dt>Comparison</dt><dd>Single vs double ProGlide for the main access</dd>
+        <dt>Primary endpoint</dt><dd>In-hospital VARC-3 access-related major or minor vascular complications <span class="num">13.1% vs 15.1%</span> (−2.2 points, −7.0 to 2.6); non-inferior (margin 3.19 points)</dd>
+        <dt>Safety</dt><dd>Major vascular complications 0.5% vs 1.4%; access-site stenosis 5.0% vs 7.9%; extra closure device 2.5% vs 0.9%</dd>
+      </dl>
+    </article>
+
+    <article class="trial">
+      <div class="head">
+        <div class="row"><span class="src">JAMA Cardiology · Nov 3, 2026 (during TCT) · PMID 42976368</span></div>
+        <h3><a href="https://doi.org/10.1001/jamacardio.2026.5260">DUOTAP: routine post-dilation of balloon-expandable TAVI valves</a></h3>
+      </div>
+      <p class="bottom"><span class="label">Bottom line</span>Post-dilation gives a rounder, larger valve with better haemodynamics on imaging. These are surrogate endpoints from one centre, so this alone should not change practice; it may become standard if durability and clinical data follow.</p>
+      <dl class="facts">
+        <dt>Design</dt><dd>Single-centre (Vienna), single-blind, sham-controlled RCT; N=148; CT at 3 months</dd>
+        <dt>Population</dt><dd>Severe AS, transfemoral TAVI with a balloon-expandable valve, no high-risk CT or angiographic features</dd>
+        <dt>Comparison</dt><dd>Routine post-dilation with the delivery balloon at the same volume vs sham</dd>
+        <dt>Primary endpoint</dt><dd>Valve asymmetry index <span class="num">1.2% vs 2.8%</span> (geometric mean ratio 0.30, 0.18–0.47)</dd>
+        <dt>Safety</dt><dd>No difference in procedural adverse events; less leaflet thickening (HALT) and less mild-or-worse paravalvular leak</dd>
+      </dl>
+    </article>
+  </section>
+
+  <section id="imaging">
+    <header>
+      <span class="label">Imaging, vascular &amp; other</span>
+      <h2>Imaging, vascular &amp; other</h2>
+    </header>
+
+    <p class="empty">Nothing new beyond P4, the CCTA-guided PCI trial in Congress watch.</p>
+  </section>
+
+  <section id="radar">
+    <header>
+      <span class="label">On the radar</span>
+      <h2>On the radar</h2>
+    </header>
+    <ul class="radar">
+      <li><span class="what">CLASP II TR: PASCAL tricuspid TEER vs medical therapy (presented at TCT, Nov 2–3)</span><span>450 patients with severe TR. Win ratio 1.98 (1.47–2.67) at 6 months, driven by quality of life. No peer-reviewed paper found yet.</span><span class="meta">TCT 2026 · <a href="https://www.tctmd.com/news/clasp-ii-tr-pascal-t-teer-offers-health-status-benefits-and-more">TCTMD</a></span></li>
+      <li><span class="what">TRANSFORM II: sirolimus-coated balloon vs DES (presented at TCT, Nov 1)</span><span>Reported non-inferior to everolimus DES for 12-month target lesion failure in de novo CAD. Lancet paper accepted but not yet online.</span><span class="meta">TCT 2026 · <a href="https://www.pcronline.com/News/Congress-coverages/TCT/2026/TRANSFORM-II-SCB-vs-DES-in-native-coronary-vessels">PCRonline</a></span></li>
+      <li><span class="what">HD-PCI: 100 vs 70 U/kg heparin in elective PCI (presented at TCT, Nov 1)</span><span>Cluster crossover. 30-day death, MI or TVR 1.2% vs 1.0% (OR 1.29, 0.89–1.87); major bleeding 1.0% in both. Not yet published.</span><span class="meta">TCT 2026 · <a href="https://www.acc.org/Latest-in-Cardiology/Articles/2026/11/01/00/11/sun-229pm-hd-pci-tct-2026">ACC</a></span></li>
+      <li><span class="what">TRAVEL III: LuX-Valve Plus TTVR vs medical therapy for severe TR</span><span>On the TCT late-breaking programme; no results or paper verified.</span><span class="meta">TCT 2026</span></li>
+      <li><span class="what">IRIS-MAIN: PCI vs CABG for left main disease over 10 years</span><span>5,379-patient Asian registry; mortality 24.0% vs 22.9% (HR 1.00, 0.87–1.14). Observational.</span><span class="meta">Lancet · Nov 3 · <a class="mono" href="https://doi.org/10.1016/S0140-6736(26)02104-5">doi:10.1016/S0140-6736(26)02104-5</a></span></li>
+      <li><span class="what">ENCIRCLE at 2 years: transseptal SAPIEN M3 TMVR (n=299)</span><span>MR ≤1+ in 97%, but 2-year death 25.1%, HF hospitalization 23.0% and disabling stroke 6.6%.</span><span class="meta">JACC · Nov 3 · <a class="mono" href="https://doi.org/10.1016/j.jacc.2026.10.047">doi:10.1016/j.jacc.2026.10.047</a></span></li>
+      <li><span class="what">HELIOS-B open-label extension: vutrisiran in ATTR-CM</span><span>Starting vutrisiran early vs after placebo: CV events or death HR 0.63 (0.51–0.79) through 48 months. Supports early diagnosis and treatment.</span><span class="meta">Circulation · Nov 3 · <a class="mono" href="https://doi.org/10.1161/CIRCULATIONAHA.126.080735">doi:10.1161/CIRCULATIONAHA.126.080735</a></span></li>
+      <li><span class="what">SPYRAL AFFIRM: US post-approval renal denervation study (n=594)</span><span>Single-arm; office SBP −18.2 and 24-hour SBP −9.7 mmHg at 6 months.</span><span class="meta">Circ Cardiovasc Interv · Nov 3 · <a class="mono" href="https://doi.org/10.1161/CIRCINTERVENTIONS.126.017422">doi:10.1161/CIRCINTERVENTIONS.126.017422</a></span></li>
+      <li><span class="what">VERITAS: next-generation dual-seal LAAO device (Abbott) at 1 year</span><span>Complete closure 91%, device-related thrombus 3.3%, ischaemic stroke or systemic embolism 1.8%.</span><span class="meta">JACC Cardiovasc Interv · Nov 1 · <a class="mono" href="https://doi.org/10.1016/j.jcin.2026.10.023">doi:10.1016/j.jcin.2026.10.023</a></span></li>
+      <li><span class="what">FLOWPROMOTE: lower LDL-C, more plaque regression on CCTA (n=104)</span><span>LDL-C 42 vs 70 mg/dL gave greater total plaque regression (−21% vs −14%) in statin-naive CAD.</span><span class="meta">JAMA Cardiol · Oct 30 · <a class="mono" href="https://doi.org/10.1001/jamacardio.2026.4788">doi:10.1001/jamacardio.2026.4788</a></span></li>
+      <li><span class="what">Microvascular resistance reserve in ANOCA (n=553)</span><span>Thermodilution-derived coronary microvascular dysfunction did not predict events over 27 months.</span><span class="meta">JAMA Cardiol · Nov 1 · <a class="mono" href="https://doi.org/10.1001/jamacardio.2026.5270">doi:10.1001/jamacardio.2026.5270</a></span></li>
+      <li><span class="what">GLP-1 receptor agonists and arrhythmias: network meta-analysis of 94 RCTs</span><span>Subcutaneous semaglutide lowered AF vs placebo (RR 0.82, 0.68–0.99).</span><span class="meta">Heart Rhythm · Oct 26 · <a class="mono" href="https://doi.org/10.1016/j.hrthm.2026.10.052">doi:10.1016/j.hrthm.2026.10.052</a></span></li>
+      <li><span class="what">NODULE-SHOCK: atherectomy plus IVL for calcified nodules (n=120, single centre)</span><span>Rotational atherectomy plus IVL gave a larger stent area than IVL alone (7.41 vs 6.23 mm²).</span><span class="meta">JACC Cardiovasc Interv · Nov 1 · <a class="mono" href="https://doi.org/10.1016/j.jcin.2026.10.001">doi:10.1016/j.jcin.2026.10.001</a></span></li>
+      <li><span class="what">Hepatic angiotensinogen siRNA, phase 1</span><span>A single 600-mg dose cut AGT by about 90% and 24-hour SBP by 12.9 mmHg at 24 weeks.</span><span class="meta">JAMA Cardiol · Oct 30 · <a class="mono" href="https://doi.org/10.1001/jamacardio.2026.4936">doi:10.1001/jamacardio.2026.4936</a></span></li>
+      <li><span class="what">Just after the window, covered next week</span><span>H-HeFT (hydralazine–isosorbide dinitrate in HFrEF), plozasiran for severe hypertriglyceridaemia, and HOBIT-AF (weight loss after AF ablation).</span><span class="meta">EHJ · Nov 4 · <a class="mono" href="https://doi.org/10.1093/eurheartj/ehag773">doi:10.1093/eurheartj/ehag773</a> · NEJM · Nov 5 · <a class="mono" href="https://doi.org/10.1056/NEJMoa2610014">doi:10.1056/NEJMoa2610014</a> · Europace · Nov 4 · <a class="mono" href="https://doi.org/10.1093/europace/euag178">doi:10.1093/europace/euag178</a></span></li>
+      <li><span class="what">Coming up</span><span>AHA Scientific Sessions 2026 in November, with full Lp(a)HORIZON data expected.</span></li>
+    </ul>
+  </section>
+
+  <footer>
+    <p><b>Method.</b> PubMed searches (Entrez date Oct 25 – Nov 5, 2026) across tier-listed journals for randomized trials, meta-analyses, guidelines and statements, plus a sweep of cardiovascular items in the top-tier and subspecialty journals. Crossref checks of NEJM, Lancet, JAMA, Circulation and JACC online-first content looked for TCT simultaneous publications. Web checks covered FDA approvals and recalls over the trailing 60 days, guideline releases and the TCT 2026 late-breakers. Every journal entry has a PubMed-verified PMID and DOI with an online date of Oct 26 – Nov 1, or Nov 1–3 for TCT papers. CLASP II TR, TRANSFORM II and HD-PCI could not be matched to a published paper and are listed under On the radar. Regulatory items cite FDA, company or news sources. This issue was published late, on Thursday, Nov 5.</p>
+  </footer>
+</div>
+</body>
+</html>
